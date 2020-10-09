@@ -1,2 +1,6 @@
+/* 
+ * Header file for client.h
+ */
+
 #include <stdlib.h>
-int sendCMD(char cmd, unsigned short val);
+int sendCMD(unsigned char cmd, unsigned short val);

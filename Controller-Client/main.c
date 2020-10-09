@@ -2,6 +2,7 @@
 #include "client.h"
 #include <stdlib.h>
 
+/* Just run the controller() Function */
 int main (int argc, char *argv[]){
 
 	controller();

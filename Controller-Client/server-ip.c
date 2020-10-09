@@ -1,10 +1,11 @@
 /*
- * server.c
- *
+ * server-ip.c
+ * This server is running on TCP protocol
  * This is a sample internet server application that will respond
  * to requests on port 5000
  */
 
+/* Header File*/
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -20,6 +21,7 @@
 #include <sys/wait.h>
 
 #define PORT 5000
+
 unsigned char buffer[4];
 
 
@@ -125,23 +127,18 @@ main (int argc, char *argv[])
 			/*
 			 * this is done by CHILD ONLY!
 			 *
-			 * read a block of info max BUFSIZE. compare 
-			 * against 3 commands: date, who, df
+			 * read a block of info max BUFSIZE. 
 			 */
 
 			read (client_socket, buffer, BUFSIZ);
 
-			/*
-			 * process command, and obtain outgoing data
-			 */
-
+			/* print the incoming buffer */
 			printf("Incoming Buffer: %x%x%x", buffer[0],buffer[1],buffer[2]);
 
 			/*
 			 * write data to client, close socket, and exit child app
 			 */
 
-			write (client_socket, buffer, len);
 			close (client_socket);
 			return 0;
 		}		

@@ -1,21 +1,11 @@
-/* Gregs Controller Button Mapout
- * Button 0: A
- * Button 1: B
- * Button 2: C
- * Button 3: X
- * Button 4: Y
- * Button 5: Z
- * Button 6: L Trig
- * Button 7: R Trig
- ********* First column is location on controller, second column is direction. L L = Left joystick Left direction ************
- * Axis 0: L L
- * Axis 1: L U
- * Axis 2: Slider
- * Axis 3: R L
- * Axis 4: R U
- * Axis 5: D L
- * Axis 6: D U
+/*
+ * Team: Smooth Brains. 
+ * 	Members: Gregory Huras, Caleb Hoeksema, Andrew Sammut
+ *	
+ *	Sources for controller Code: https://kusemanohar.info/2015/12/19/programming-with-joystick-on-linux/ 
  */
+
+/* Header Files */
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -26,15 +16,17 @@
 #include "controllerH.h"
 #include "client.h"
 
+/* Macros For Reading Controller */
 #define JS_EVENT_BUTTON        0x01    /* button pressed/released */
 #define JS_EVENT_AXIS          0x02    /* joystick moved */
 #define JS_EVENT_INIT		0x80    /* initial state of device */
 
-// Define which controller is hooked up For Program for different controller switch statement
+/* Which user and Controller is being used (each controller would have a different button map out)*/
 #define GREG
 //#define CALEB
 //#define ANDREW
 
+/* Joy Stick Event strucuct */
 struct js_event {
 	unsigned int time;	/* event timestamp in milliseconds */
 	short value;   	/* value */
@@ -42,17 +34,21 @@ struct js_event {
 	unsigned char number;	/* axis/button number */
 };
 
-int fd = 0;
-
-char cmd;
+/* Assign button map and Value from the Controller */
+unsigned char cmd;
 unsigned short val;
 
+/* Controller Function
+ * Opens up the controller device, reads the event and then send the value
+ * to the Client.c program to send the informtaion to the Lab computer 
+ */
 int controller (void){
 	
 	int status = 0;
 	// Check to see if the device can be opened
 	int fd = open ("/dev/input/js0", O_RDONLY);
- 
+ 	
+ 	/* Check if the controller can be opened */
 	if( fd < 0 ){ 
 		printf("cannot open dev\n");
 		return 1;
@@ -60,22 +56,42 @@ int controller (void){
  	
 	else{
 		printf("opened success...:)\n");
-
 	}
 	
-	while (1){
+	/* Create and Instance of the Controller struct */
+	struct js_event event;
 	
-		struct js_event event;
-		read( fd, &event, sizeof(event) ); // Program keeps getting stuck here
-		if( event.type == JS_EVENT_BUTTON || event.type == JS_EVENT_AXIS ){
+	/* Enter a while loop to constantly read the values on the controller */
+	while (1){
 		
+		/* Read the controller */
+		read( fd, &event, sizeof(event) );
+		
+		/* If the type of the event that is read corresponds to a button being pressed or axis being moved, 
+		 * then read that value and event. 
+		 */
+		 
+		if( event.type == JS_EVENT_BUTTON || event.type == JS_EVENT_AXIS ){
+			
+			// If the button is pressed
 			if( event.type == JS_EVENT_BUTTON ){ 
+				
+				/* Send the event number (corresponds to which button or axis is being pressed) and send the read value and a flag indicating its a button being read
+				 *
+				 */
 				status = command( event.number, event.value, 0);
 			}
+			// If the axis is pressed
+			
 			else{ 
+				/* Send the event number (corresponds to which button or axis is being pressed) and send the read value and a flag indicating its an axis being read
+				 *
+				 */
 				status = command(event.number, event.value, 1);	
 			}
 		}
+		
+		// If a button isnt been pressed, the controller is initializing.
 		else{
  
 			printf("Init Events\n");
@@ -87,53 +103,84 @@ int controller (void){
 
 }
 
+
+/* Gregs Controller Button Mapout
+ *
+ ********* First column is location on controller, second column is direction. L L = Left joystick Left direction ************
+ *
+ *			Assigned Hex Value
+ *
+ * Axis 0: L L			0x1
+ * Axis 1: L U			0x2
+ * Axis 2: Slider		0x3
+ * Axis 3: R L			0x4
+ * Axis 4: R U			0x5
+ * Axis 5: D L			0x6
+ * Axis 6: D U			0x7
+ *
+ * Button 0: A			0x8
+ * Button 1: B			0x9
+ * Button 2: C			0xa
+ * Button 3: X			0xb
+ * Button 4: Y			0xc
+ * Button 5: Z			0xd
+ * Button 6: L Trig		0xe
+ * Button 7: R Trig		0xf
+ * Button 8: Save Button	0x10
+ * 
+ *
+ */
+
+/* 
+ * Take teh read value, assign its corresponding hex value and send the information off to be sent to the lab computer
+ */
+
 int command (u_int16_t number, u_int16_t value, int Periferal){
-	#ifdef GREG
-	cmd = 0x0;
-	if( Periferal == 1){
 	
-		switch(number){ // This switch is for the axis cases
+	#ifdef GREG
+	
+	// Set the cmd Char to 0
+	cmd = 0x0;
+	
+	// if the axis flag has been set
+	if( Periferal == 1){	
+		
+		// reading the number value (Corresponds to which axis or button has been pressed
+		// 6 different axis's to read from
+		switch(number){ 
 			
 			case 0:
-				//printf( "axis#%x value:%x\n", number, value );
-				
 				cmd = 0x1;
 				val = value;
 				
 				break;
 				
 			case 1:
-				//printf( "axis#%x value:%x\n", number, value );
 				cmd = 0x2;
 				val = value;
 				break;
 				
 			case 2:
-				//printf( "axis#%x value:%x\n", number, value );
 				cmd = 0x3;
 				val = value;
 				break;
 				
 			case 3:
-				//printf( "axis#%x value:%x\n", number, value );
 				cmd = 0x4;
 				val = value;
 				break;
 				
 			case 4:
-				//printf( "axis#%x value:%x\n", number, value );
 				cmd = 0x5;
 				val = value;
 				break;
 				
 			case 5:
-				//printf( "axis#%x value:%x\n", number, value );
 				cmd = 0x6;
 				val = value;
 				break;
 				
 			case 6:
-				//printf( "axis#%x value:%x\n", number, value );
 				cmd = 0x7;
 				val = value;
 				break;
@@ -142,58 +189,52 @@ int command (u_int16_t number, u_int16_t value, int Periferal){
 				return 1;
 		}	
 	}
+	// else the button flag has been set
 	else{
 	
-	switch(number){ // This switch is for the Button cases.
+	// reading the number value (Corresponds to which axis or button has been pressed
+	// 8 different axis's to read from
+	switch(number){ 
 			
 			case 0:
-				//printf( "button#%d value:%d\n", number, value );
 				cmd = 0x8;
 				val = value;
 				break;
 				
 			case 1:
-				//printf( "button#%d value:%d\n", number, value );
 				cmd = 0x9;
 				val = value;
 				break;
 				
 			case 2:
-				//printf( "button#%d value:%d\n", number, value );
 				cmd = 0xa;
 				val = value;
 				break;
 				
 			case 3:
-				//printf( "button#%d value:%d\n", number, value );
 				cmd = 0xb; 
 				val = value;
 				break;
 				
 			case 4:
-				//printf( "button#%d value:%d\n", number, value );
 				cmd = 0xc;
 				val = value;
 				break;
 				
 			case 5:
-				//printf( "button#%d value:%d\n", number, value );
 				cmd = 0xd;
 				val = value;
 				break;
 				
 			case 6:
-				//printf( "button#%d value:%d\n", number, value );
 				cmd = 0xe;
 				val = value;
 				break;
 			case 7:
-				//printf( "button#%d value:%d\n", number, value );
 				cmd = 0xf;
 				val = value;
 				break;
 			case 8:
-				//printf( "button#%d value:%d\n", number, value );
 				cmd = 0x10;
 				val = value;
 				break;
@@ -204,8 +245,10 @@ int command (u_int16_t number, u_int16_t value, int Periferal){
 	
 	}
 	
+	/*
+	 * If data has been read from a button or an axis, then send that information to the client.
+	 */
 	if (cmd != 0x0){
-			printf("Command Recieved\n");
 			sendCMD(cmd,val);
 	}
 	#endif
