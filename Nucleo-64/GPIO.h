@@ -1,8 +1,10 @@
 /*****************************************************************************
  * GPIO.h
+ * 
  * Contains function prototypes to initialize a GPIO port
- * Caleb Hoeksema, Gregory Huras
- * April 2020
+ * 
+ * Caleb Hoeksema, Gregory Huras, Andrew Sammut
+ * October 2020
  ****************************************************************************/
  
 
@@ -12,6 +14,7 @@
 #include "SysClock.h"
 #include "stm32f303xe.h"
 #include "utils.h"
+#include "virtualPort.h"
 
 
 // Pin modes
@@ -27,7 +30,7 @@
 // Pin speed
 #define		LOW_SPEED		0x0UL
 #define		MED_SPEED		0x1UL
-#define		FAST_SPEED	0x2UL
+#define		FAST_SPEED		0x2UL
 #define		HI_SPEED		0x3UL
 
 // Pin pull up/down
@@ -46,5 +49,9 @@
 #define		GPIOA_PIN_SPEED(pin, speed)			FORCE_BITS(GPIOA->OSPEEDR, 3UL << (2*(pin)), (speed) << (2*(pin)))
 #define		GPIOA_PIN_PULL(pin, pull)				FORCE_BITS(GPIOA->PUPDR, 3UL << (2*(pin)), (pull) << (2*(pin)))
 
+
+// Function Prototypes
+void GPIO_CLOCK_ENABLE(volatile uint32_t port);
+void GPIOA_Init(void);
 
 #endif

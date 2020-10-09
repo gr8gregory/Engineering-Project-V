@@ -1,34 +1,34 @@
 /***************************************************************************
  * USART.c
  *
- * File containing the functions for running a serial menu for use with the
- * 		MCB project (S4W 2020)
+ * File containing the functions for initializing a serial (USART) port
  *
- * Caleb Hoeksema
- * May 2020
+ * Caleb Hoeksema, Gregory Huras, Andrew Sammut
+ * October 2020
  **************************************************************************/
 
-
-// Header file
+// Header files
 #include "USART.h"
-
-// Global variables
-volatile uint8_t vportInput[MAX_SER_BUF_SIZE];	// Stores virtual port input
-volatile uint32_t vportOffset = 0;							// Stores virtual port input offset
-uint8_t rxFlag = 0;															// Indicates if there is input
+#include "GPIO.h"
 
 
 // Function to initialize a generic USART port
 void usartInit(USART_TypeDef * USARTx) {
 	
-	USARTx->CR1 &= ~USART_CR1_UE;									// Disables the USART port
+	USARTx->CR1 &= ~USART_CR1_UE;				// Turn off port
 	USARTx->CR1 &= ~USART_CR1_M;
 	
 	USARTx->CR2 &= ~USART_CR2_STOP;
-	USARTx->CR1 &= ~USART_CR1_PCE;
+	// USARTx->CR1 &= ~USART_CR1_PCE;a
 	USARTx->CR1 &= ~USART_CR1_OVER8;
 
-	USARTx->BRR = 0x208D;													// No idea where this is from
+	// CSet Baudrate to 9600 using APB frequency (72,000,000 Hz)
+	// If oversampling by 16, Tx/Rx baud = f_CK / USARTDIV,  
+	// If oversampling by 8,  Tx/Rx baud = 2*f_CK / USARTDIV
+  // When OVER8 = 0, BRR = USARTDIV
+	// USARTDIV = 72MHz/9600 = 7500
+	// BRR limited to 16 bits
+	USARTx->BRR = SystemCoreClock/BAUD_RATE;
 	
 	USARTx->CR1 |= (USART_CR1_TE | USART_CR1_RE);
 	
@@ -39,7 +39,7 @@ void usartInit(USART_TypeDef * USARTx) {
 		NVIC_SetPriority(USART2_IRQn, 0);
 		NVIC_EnableIRQ(USART2_IRQn);
 		
-	}
+	} // End if
 		
 	USARTx->CR1 |= USART_CR1_UE;
 	
@@ -50,20 +50,3 @@ void usartInit(USART_TypeDef * USARTx) {
 }	// End usartInit()
 
 
-// Interrupt handler for virtual port recieve
-void USART2_IRQHandler(void) {
-	
-	uint8_t junk = 0;													// For catching invalid requests (may cause a warning)
-	if (USART2->ISR & USART_ISR_RXNE) {				// Check if there is actually something there
-		
-		vportOffset++;													// Move to next byte in buffer
-		if (vportOffset >= MAX_SER_BUF_SIZE)		// Overwrite the start of the buffer
-			vportOffset = 0;
-		
-		rxFlag++;																// Set flag
-		vportInput[vportOffset] = USART2->RDR;	// Read, acknowledge ISR
-		
-	}	// End if
-	
-	junk = USART2->RDR;												// Acknowledge the interrupt request if called invalidly
-}	// End USART2_IRQHandler

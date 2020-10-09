@@ -1,11 +1,10 @@
 /***************************************************************************
  * USART.h
  *
- * File containing the functions for running a serial menu for use with the
- * 		MCB project (S4W 2020)
+ * File containing the function prototypes for initializing serial (USART) ports
  *
- * Caleb Hoeksema
- * May 2020
+ * Caleb Hoeksema, Gregory Huras, Andrew Sammut
+ * October 2020
  **************************************************************************/
 
 
@@ -18,14 +17,15 @@
 
 // Constants
 #define 	MAX_SER_BUF_SIZE		40
+#define 	BAUD_RATE 				9600
 
 // Macros
-#define		EnableInterrupts 		asm("ISB ; CPSIE I")
-#define		DisableInterrupts		asm("CPSID I")
+#define		EnableInterrupts 		__asm("ISB ; CPSIE I")
+#define		DisableInterrupts		__asm("CPSID I")
+
 
 // Function prototypes
 void usartInit(USART_TypeDef * USARTx);
 void USART2_IRQHandler(void);
-
 
 #endif

@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Objects\</OutputDirectory>
-          <OutputName>LED_Flash</OutputName>
+          <OutputName>Menu_Nucleo</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -413,11 +413,6 @@
               <FilePath>.\startup_stm32f303xe.s</FilePath>
             </File>
             <File>
-              <FileName>stm32f303xe.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\stm32f303xe.h</FilePath>
-            </File>
-            <File>
               <FileName>SysClock.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\SysClock.c</FilePath>
@@ -451,6 +446,21 @@
               <FileName>virtualPort.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\virtualPort.h</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f3xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\system_stm32f3xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>Heartbeat.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Heartbeat.c</FilePath>
+            </File>
+            <File>
+              <FileName>Heartbeat.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Heartbeat.h</FilePath>
             </File>
           </Files>
         </Group>
