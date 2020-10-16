@@ -1,3 +1,15 @@
+<<<<<<< Updated upstream
+=======
+/*****************************************************************************
+ * LED.h
+ * 
+ * Contains function prototypes to initialize an LED
+ * 
+ * Caleb Hoeksema, Gregory Huras, Andrew Sammut, Bill Stefanuk
+ * October 2020
+ ****************************************************************************/
+
+>>>>>>> Stashed changes
 #ifndef __STM32F303RET6_NUCLEO64_LED_H
 #define __STM32F303RET6_NUCLEO64_LED_H
 

@@ -8,9 +8,20 @@
  * October 2020
  **************************************************************************/
 
+<<<<<<< Updated upstream
 
 // Header file
 #include "virtualPort.h"
+=======
+// Header file
+#include "virtualPort.h"
+
+
+// Global Variables
+volatile uint8_t vportInput[MAX_SER_BUF_SIZE];	// Stores virtual port input
+volatile uint32_t vportOffset = 0;							// Stores virtual port input offset
+volatile uint8_t rxFlag = 0;										// Indicates if there is input
+>>>>>>> Stashed changes
 
 
 // Function to initialize a virtual port for control and debugging
@@ -36,6 +47,7 @@ void virtualPortInit(void) {
 }	// End virtualPortInit();
 
 
+<<<<<<< Updated upstream
 // Private function to initialize GPIOD for a virtual port
 static void gpioConfig(void) {
 	
@@ -60,6 +72,26 @@ static void gpioConfig(void) {
 	GPIOA_PIN_DRV_TYPE(VPORT_RX_PIN, PUSH_PULL);
 	
 }	// End gpioConfig()
+=======
+// Interrupt handler for virtual port recieve
+void USART2_IRQHandler(void) {
+	
+	uint8_t junk = 0;													// For catching invalid requests (may cause a warning)
+	if (USART2->ISR & USART_ISR_RXNE) {				// Check if there is actually something there
+		
+		vportOffset++;													// Move to next byte in buffer
+		if (vportOffset >= MAX_SER_BUF_SIZE)		// Overwrite the start of the buffer
+			vportOffset = 0;
+		
+		rxFlag++;																// Set flag
+		vportInput[vportOffset] = USART2->RDR;	// Read, acknowledge ISR
+		
+	}	// End if
+	
+	junk = USART2->RDR;												// Acknowledge the interrupt request if called invalidly
+	
+}	// End USART2_IRQHandler
+>>>>>>> Stashed changes
 
 
 /* Functions for sending data from the processor to the terminal */

@@ -8,7 +8,10 @@
  * May 2020
  **************************************************************************/
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 // Header file
 #include "USART.h"
 
@@ -25,7 +28,11 @@ void usartInit(USART_TypeDef * USARTx) {
 	USARTx->CR1 &= ~USART_CR1_M;
 	
 	USARTx->CR2 &= ~USART_CR2_STOP;
+<<<<<<< Updated upstream
 	USARTx->CR1 &= ~USART_CR1_PCE;
+=======
+	// USARTx->CR1 &= ~USART_CR1_PCE;
+>>>>>>> Stashed changes
 	USARTx->CR1 &= ~USART_CR1_OVER8;
 
 	USARTx->BRR = 0x208D;													// No idea where this is from

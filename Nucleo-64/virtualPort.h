@@ -23,9 +23,15 @@
 
 
 // Constants
+<<<<<<< Updated upstream
 #define		VP_CLEAR						vportPrintf("\033[2J");		// Clear screen
 #define		VP_RESET						vportPrintf("\033[0;0H"); // Cursor to 0,0
 #define		VP_NEW_LINE					vportPrintf("\033[1B")		// Cursor down 1 line
+=======
+#define		VP_CLEAR						vportPrintf("\033[2J");			// Clear screen
+#define		VP_RESET						vportPrintf("\033[0;0H"); 	// Cursor to 0,0
+#define		VP_NEW_LINE					vportPrintf("\033[1B")			// Cursor down 1 line
+>>>>>>> Stashed changes
 
 // Pins: Virtual port (USART2)
 #define 	VPORT_TX_PIN				2UL

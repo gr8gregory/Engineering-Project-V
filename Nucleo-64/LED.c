@@ -12,6 +12,7 @@ void LED_Init(void){
 	/* Enable GPIOs clock */ 	
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 	
+<<<<<<< Updated upstream
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// LD2 = PA5
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,6 +35,19 @@ void LED_Init(void){
 	// GPIO Push-Pull: No pull-up, pull-down (00), Pull-up (01), Pull-down (10), Reserved (11)
 	GPIOA_PIN_PULL(LED_PIN, PULL_NONE);
 	//GPIOB->PUPDR   &= ~(3U<<(2*2));  // No pull-up, no pull-down
+=======
+	// GPIO Mode
+	GPIOx_PIN_MODE(VIRT_PORT, LED_PIN, MODER_OUT);
+	
+	// GPIO Speed
+	GPIOx_PIN_SPEED(GPIOA, LED_PIN, HI_SPEED);
+	
+	// GPIO Output Type 
+	GPIOx_OP_TYPE(GPIOA, LED_PIN, PUSH_PULL);
+	
+	// GPIO Push-Pull
+	GPIOx_PIN_PULL(GPIOA, LED_PIN, PULL_NONE);
+>>>>>>> Stashed changes
 	
 }
 
