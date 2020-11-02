@@ -1,27 +1,17 @@
 /*
- * server.c
- *
+ * server-ip.c
+ * This server is running on TCP protocol
  * This is a sample internet server application that will respond
  * to requests on port 5000
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <signal.h>
-#include <sys/wait.h>
+/* Header File*/
 
-#define PORT 5000
+#include "server-ip.h"
 
-char buffer[BUFSIZ];
+
+
+unsigned char buffer[4];
 
 
 /*
@@ -121,57 +111,24 @@ main (int argc, char *argv[])
 		 * fork a child
 		 */
 
+
 		if (fork() == 0) {
 			/*
 			 * this is done by CHILD ONLY!
 			 *
-			 * read a block of info max BUFSIZE. compare 
-			 * against 3 commands: date, who, df
+			 * read a block of info max BUFSIZE. 
 			 */
 
 			read (client_socket, buffer, BUFSIZ);
 
-			/*
-			 * process command, and obtain outgoing data
-			 */
+			/* print the incoming buffer */
+			//printf("Incoming Buffer: %x%x%x\n", buffer[0],buffer[1],buffer[2]);
+			serverOutput(buffer);
 
-			if (strcmp (buffer, "date") == 0) {
-				if (len = (p = popen ("date", "r")) != NULL) {
-					len = fread (buffer, 1, sizeof (buffer), p);
-					pclose (p);
-				} else {
-					strcpy (buffer, "Can't run date command\n");
-					len = strlen (buffer);
-				}	/* endif */
-			} else if (strcmp (buffer, "who") == 0) {
-				if (len = (p = popen ("who", "r")) != NULL) {
-					len = fread (buffer, 1, sizeof (buffer), p);
-					pclose (p);
-				} else {
-					strcpy (buffer, "Can't run who command\n");
-					len = strlen (buffer);
-				}	/* endif */
-			} else if (strcmp (buffer, "df") == 0) {
-				if (len = (p = popen ("df", "r")) != NULL) {
-					len = fread (buffer, 1, sizeof (buffer), p);
-					pclose (p);
-				} else {
-					strcpy (buffer, "Can't run df command\n");
-					len = strlen (buffer);
-				}	/* endif */
-			} else {
-				strcpy (buffer, "invalid command\n");
-				len = strlen (buffer);
-			}	/* endif */
-
-			/*
-			 * write data to client, close socket, and exit child app
-			 */
-
-			write (client_socket, buffer, len);
 			close (client_socket);
 			return 0;
-		} else {
+		}		
+		else {
 			/*
 			 * this is done by parent ONLY
 			 */
