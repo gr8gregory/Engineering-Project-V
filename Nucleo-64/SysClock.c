@@ -1,11 +1,12 @@
 #include "SysClock.h"
 
-//******************************************************************************************
-// Switch the PLL source from MSI to HSI, and select the PLL as SYSCLK source.
-//******************************************************************************************
+
+//***********************************************************************************************
+// Use the external 8 MHz clock, multiply 9 for 72 MHz system clock, use for peripheral busses
+//***********************************************************************************************
+
+
 void System_Clock_Init(void){
-	
-	uint32_t HSITrim;
 
 	// To correctly read data from FLASH memory, the number of wait states (LATENCY)
   // must be correctly programmed according to the frequency of the CPU clock
@@ -13,95 +14,39 @@ void System_Clock_Init(void){
 	FLASH->ACR &= ~FLASH_ACR_LATENCY;
 	FLASH->ACR |=  FLASH_ACR_LATENCY_2;
 		
-	// Enable the Internal High Speed oscillator (HSI)
-	RCC->CR |= RCC_CR_HSION;
-	while((RCC->CR & RCC_CR_HSIRDY) == 0);
-	// Adjusts the Internal High Speed oscillator (HSI) calibration value
-	// RC oscillator frequencies are factory calibrated by ST for 1 % accuracy at 25oC
-	// After reset, the factory calibration value is loaded in HSICAL[7:0] of RCC_ICSCR	
-	HSITrim = 16; // user-programmable trimming value that is added to HSICAL[7:0] in ICSCR.
-	RCC->CR &= ~RCC_CR_HSITRIM;
-	RCC->CR |= HSITrim << 3;		// Third value in the register
+	// Enable the External High Speed oscillator (HSE)
+	RCC->CR |= RCC_CR_HSEON;
+	while((RCC->CR & RCC_CR_HSERDY) == 0);
 	
+	// Turn PLL off (might already be on)
 	RCC->CR    &= ~RCC_CR_PLLON; 
 	while((RCC->CR & RCC_CR_PLLRDY) == RCC_CR_PLLRDY);
 	
-	// Select clock source to PLL
-	RCC->CFGR &= ~RCC_CFGR_PLLSRC;
-	RCC->CFGR |= RCC_CFGR_PLLSRC_HSI_PREDIV; // 00 = No clock, 01 = MSI, 10 = HSI, 11 = HSE
+	// Select HSE as clock source to PLL
+	RCC->CFGR &= ~RCC_CFGR_PLLSRC_Msk;
+	RCC->CFGR |= RCC_CFGR_PLLSRC_HSE_PREDIV; // select HSE as PLL input
 	
-	// Make PLL as 64 MHz (NOT SURE HOW TO MAKE THIS HIGHER!)
-	// f(VCO clock) = f(PLL clock input) * (PLLMUL / PLLNODIV) = 16MHz * 16/2 = 128 MHz
-	// f(PLL) = f(VCO clock) / PLLNODIV = 128MHz/2 = 64MHz
-	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PLLMUL) | 15U << 18;	// 15U gives x16
-	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PLLNODIV) | 0U << 31; // 0: DIVBY1, 1: DIVBY2; 31ST BIT
+	// Set PLL to multiply HSE by 9 to get 72 MHz
+	RCC->CFGR |= RCC_CFGR_PLLNODIV; //dont divide PLL output by 2
+	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PLLMUL) | RCC_CFGR_PLLMUL9; // PLL multiplier value
 
-	/* NO IDEA ABOUT THESE NEXT 2 LINES SO I JUST DITCHED THEM FOR NOW*/
-	// RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLR;  // 00: PLLR = 2, 01: PLLR = 4, 10: PLLR = 6, 11: PLLR = 8	
-	// RCC->PLLCFGR |= RCC_PLLCFGR_PLLREN; // Enable Main PLL PLLCLK output 
-
-	// Re-enable PLL
+	// Turn PLL on and wait for it to be stable
 	RCC->CR   |= RCC_CR_PLLON; 
 	while((RCC->CR & RCC_CR_PLLRDY) == 0);
 	
-	// Select PLL selected as system clock
+	// Configure System Clock to use PLL
 	RCC->CFGR &= ~RCC_CFGR_SW;
 	RCC->CFGR |= RCC_CFGR_SW_PLL; // 00: MSI, 01:HSI, 10: HSE, 11: PLL
 	
-	// Wait until System Clock has been selected
+	// Wait until the System Clock has switched over to the PLL
 	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
 	
-	// The maximum frequency of the AHB, the APB1 and the APB2 domains is 72 MHz.
-	RCC->CFGR &= ~RCC_CFGR_HPRE;  // AHB prescaler = 1; SYSCLK not divided
-	RCC->CFGR &= ~RCC_CFGR_PPRE1; // APB high-speed prescaler (APB1) = 1, HCLK not divided
-	RCC->CFGR &= ~RCC_CFGR_PPRE2; // APB high-speed prescaler (APB2) = 1, HCLK not divided
-	
-	// RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLM;
-	// RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLN;
-	// RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLP; 
-	// RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLQ;	
-	// RCC->PLLCFGR |= RCC_PLLCFGR_PLLPEN; // Enable Main PLL PLLSAI3CLK output enable
-	// RCC->PLLCFGR |= RCC_PLLCFGR_PLLQEN; // Enable Main PLL PLL48M1CLK output enable
-	
-	/* NO IDEA IF THE REST OF THIS MATTERS FOR FLIPPING AN LED 
-	
-	RCC->CR &= ~RCC_CR_PLLSAI1ON;  // SAI1 PLL enable
-	while ( (RCC->CR & RCC_CR_PLLSAI1ON) == RCC_CR_PLLSAI1ON );
-	
-	// Configure and enable PLLSAI1 clock to generate 11.294MHz 
-	// 8 MHz * 24 / 17 = 11.294MHz
-	// f(VCOSAI1 clock) = f(PLL clock input) *  (PLLSAI1N / PLLM)
-	// PLLSAI1CLK: f(PLLSAI1_P) = f(VCOSAI1 clock) / PLLSAI1P
-	// PLLUSB2CLK: f(PLLSAI1_Q) = f(VCOSAI1 clock) / PLLSAI1Q
-	// PLLADC1CLK: f(PLLSAI1_R) = f(VCOSAI1 clock) / PLLSAI1R
-	RCC->PLLSAI1CFGR &= ~RCC_PLLSAI1CFGR_PLLSAI1N;
-	RCC->PLLSAI1CFGR |= 24U<<8;
-	
-	// SAI1PLL division factor for PLLSAI1CLK
-	// 0: PLLSAI1P = 7, 1: PLLSAI1P = 17
-	RCC->PLLSAI1CFGR |= RCC_PLLSAI1CFGR_PLLSAI1P;
-	RCC->PLLSAI1CFGR |= RCC_PLLSAI1CFGR_PLLSAI1PEN;
-	
-	// SAI1PLL division factor for PLL48M2CLK (48 MHz clock)
-	// RCC->PLLSAI1CFGR &= ~RCC_PLLSAI1CFGR_PLLSAI1Q;
-	// RCC->PLLSAI1CFGR |= U<<21;
-	// RCC->PLLSAI1CFGR |= RCC_PLLSAI1CFGR_PLLSAI1QEN;
-	
-	// PLLSAI1 division factor for PLLADC1CLK (ADC clock)
-	// 00: PLLSAI1R = 2, 01: PLLSAI1R = 4, 10: PLLSAI1R = 6, 11: PLLSAI1R = 8
-	// RCC->PLLSAI1CFGR &= ~RCC_PLLSAI1CFGR_PLLSAI1R; 
-	// RCC->PLLSAI1CFGR |= U<<25;
-	// RCC->PLLSAI1CFGR |= RCC_PLLSAI1CFGR_PLLSAI1REN;
-	
-	RCC->CR |= RCC_CR_PLLSAI1ON;  // SAI1 PLL enable
-	while ( (RCC->CR & RCC_CR_PLLSAI1ON) == 0);
-	
-	// SAI1 clock source selection
-	// 00: PLLSAI1 "P" clock (PLLSAI1CLK) selected as SAI1 clock
-	// 01: PLLSAI2 "P" clock (PLLSAI2CLK) selected as SAI1 clock
-	// 10: PLL "P" clock (PLLSAI3CLK) selected as SAI1 clock
-	// 11: External input SAI1_EXTCLK selected as SAI1 clock	
-	RCC->CCIPR &= ~RCC_CCIPR_SAI1SEL;
+	// Configure the peripheral clocks
+	RCC->CFGR &= ~RCC_CFGR_HPRE;  // AHB (GPIO) set to 72 MHz - System Clock  (clear all bits = no prescaler)
+	RCC->CFGR &= ~RCC_CFGR_PPRE2; // APB2 (high-speed peripherals) - 72 MHz (clear all bits = no prescaler)
+	RCC->CFGR &= ~RCC_CFGR_PPRE1; // APB1 (low-speed peripherals) - 36 MHz max - divide HCLK by 2
+	RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;		// pre-clear all bits and then set for div by 2
 
-	RCC->APB2ENR |= RCC_APB2ENR_SAI1EN; */
 }
+
+

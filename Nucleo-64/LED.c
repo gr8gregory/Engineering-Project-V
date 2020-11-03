@@ -1,59 +1,59 @@
+/*****************************************************************************
+ * LED.c
+ * 
+ * Contains functions to initialize and change the state of an LED
+ * 
+ * Caleb Hoeksema, Gregory Huras, Andrew Sammut, Bill Stefanuk
+ * October 2020
+ ****************************************************************************/
+ 
+// Header files
 #include "LED.h"
 #include "GPIO.h"
 
 
-//******************************************************************************************
-// User LEDs: 
-//   LD4 Red = PB2    LD5 Green = PE8
-// Note: The Green LED is yellow on my board.
-//       PE8 is also the TIM1_CH1N for ADC Triggers.
-//******************************************************************************************
+// Function to initialize the LED 
+	// User LED is LD2 (Green) on PA5
+	// The functions imply a red LED but it is actually Green on the board
 void LED_Init(void){
+	
 	/* Enable GPIOs clock */ 	
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 	
-	///////////////////////////////////////////////////////////////////////////////////////////////
-	// LD2 = PA5
-	///////////////////////////////////////////////////////////////////////////////////////////////
-	// GPIO Mode: Input(00, reset), Output(01), AlterFunc(10), Analog(11, reset)
-	GPIOA_PIN_MODE(LED_PIN, MODER_OUT);
+	// GPIO Mode
+	GPIOx_PIN_MODE(VIRT_PORT, LED_PIN, MODER_OUT);
 	
-	/*************************************************************/
-	// GPIOA->MODER = ~(3U<<(2*2));  
-	// GPIOA->MODER |= 1U<<(2*2);      //  Output(01)
+	// GPIO Speed
+	GPIOx_PIN_SPEED(GPIOA, LED_PIN, HI_SPEED);
 	
-	// GPIO Speed: Low speed (00), Medium speed (01), Fast speed (10), High speed (11)
-	GPIOA_PIN_SPEED(LED_PIN, HI_SPEED);
-	// GPIOA->OSPEEDR &= ~(3U<<(2*2));
-	// GPIOA->OSPEEDR |=   3U<<(2*2);  // High speed
+	// GPIO Output Type 
+	GPIOx_OP_TYPE(GPIOA, LED_PIN, PUSH_PULL);
 	
-	// GPIO Output Type: Output push-pull (0, reset), Output open drain (1) 
-	GPIOA_OP_TYPE(LED_PIN, PUSH_PULL);
-	//GPIOB->OTYPER &= ~(1U<<2);       // Push-pull
+	// GPIO Push-Pull
+	GPIOx_PIN_PULL(GPIOA, LED_PIN, PULL_NONE);
 	
-	// GPIO Push-Pull: No pull-up, pull-down (00), Pull-up (01), Pull-down (10), Reserved (11)
-	GPIOA_PIN_PULL(LED_PIN, PULL_NONE);
-	//GPIOB->PUPDR   &= ~(3U<<(2*2));  // No pull-up, no pull-down
-	
-}
+} // End LED_Init
 
-//******************************************************************************************
-// Turn Red LED On
-//******************************************************************************************
+
+// Fucntion to turn on LED
 void Red_LED_On(void){
+	
 	GPIOA->ODR |= GPIO_ODR_5;
-}
+	
+} // End Red_LED_On
 
-//******************************************************************************************
-// Turn Red LED Off
-//******************************************************************************************
+
+// Function to turn off LED
 void Red_LED_Off(void){
+	
 	GPIOA->ODR &= ~GPIO_ODR_5;
-}
+	
+} // End Red_LED_Off
 
-//******************************************************************************************
-// Toggle Red LED 
-//******************************************************************************************
+
+// Funciton to toggle LED state
 void Red_LED_Toggle(void){
+	
 	GPIOA->ODR ^= GPIO_ODR_5;
-}
+
+} // End Red_LED_Toggle

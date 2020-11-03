@@ -4,8 +4,8 @@
  * Header file for running a virtual serial port for use with a terminal
  *		emulator
  *
- * Caleb Hoeksema
- * April 2020
+ * Caleb Hoeksema, Gregory Huras, Anrew Sammut
+ * October 2020
  ****************************************************************************/
 
 
@@ -23,13 +23,14 @@
 
 
 // Constants
-#define		VP_CLEAR						vportPrintf("\033[2J");		// Clear screen
-#define		VP_RESET						vportPrintf("\033[0;0H"); // Cursor to 0,0
-#define		VP_NEW_LINE					vportPrintf("\033[1B")		// Cursor down 1 line
+#define		VP_CLEAR						vportPrintf("\033[2J");			// Clear screen
+#define		VP_RESET						vportPrintf("\033[0;0H"); 	// Cursor to 0,0
+#define		VP_NEW_LINE					vportPrintf("\033[1B")			// Cursor down 1 line
 
 // Pins: Virtual port (USART2)
 #define 	VPORT_TX_PIN				2UL
 #define 	VPORT_RX_PIN				3UL
+
 
 // Function prototypes
 void virtualPortInit(void);

@@ -1,4 +1,4 @@
-;******************** (C) COPYRIGHT 2014 STMicroelectronics ********************
+;******************** (C) COPYRIGHT 2016 STMicroelectronics ********************
 ;* File Name          : startup_stm32f303xe.s
 ;* Author             : MCD Application Team
 ;* Description        : STM32F303xE devices vector table for MDK-ARM toolchain.
@@ -37,45 +37,13 @@
 ;
 ;*******************************************************************************
 
+; Amount of memory (in bytes) allocated for Stack
+; Tailor this value to your application needs
+; <h> Stack Configuration
+;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
+; </h>
 
-;******************** Added by Dr. Zhu *****************************************************
-                ; ROM:  Symbols defined by the linker
-                IMPORT  |Load$$ER_IROM1$$Base|             ; Entry of Bootloader
-                
-                IMPORT  |Image$$ER_IROM1$$RO$$Base|        ; Start of RO output section
-                IMPORT  |Image$$ER_IROM1$$RO$$Limit|       ; First byte beyond the end of RO output section
-                IMPORT  |Image$$ER_IROM1$$RO$$Length|      ; Size of RO output section
-                
-                IMPORT  |Image$$ER_IROM1$$RW$$Base|
-                IMPORT  |Image$$ER_IROM1$$RW$$Length|
-                IMPORT  |Image$$ER_IROM1$$RW$$Limit|
-                
-                IMPORT  |Image$$ER_IROM1$$ZI$$Base|
-                IMPORT  |Image$$ER_IROM1$$ZI$$Length|
-                IMPORT  |Image$$ER_IROM1$$ZI$$Limit|
-                
-                ; RAM: Symbols defined by the linker
-                IMPORT  |Load$$RW_IRAM1$$Base|             ; Load Address 
-                IMPORT  |Image$$RW_IRAM1$$Base|            ; Start of RW output section
-                IMPORT  |Image$$RW_IRAM1$$Length|
-                IMPORT  |Image$$RW_IRAM1$$Limit|
-                
-                IMPORT  |Image$$RW_IRAM1$$RO$$Base|
-                IMPORT  |Image$$RW_IRAM1$$RO$$Base|
-                IMPORT  |Image$$RW_IRAM1$$RO$$Length|        
-                
-                IMPORT  |Image$$RW_IRAM1$$RW$$Base|       ; Start of RW output section
-                IMPORT  |Image$$RW_IRAM1$$RW$$Limit|      ; End of RW output section
-                IMPORT  |Image$$RW_IRAM1$$RW$$Length|     ; Size of RW output section
-                
-                IMPORT  |Image$$RW_IRAM1$$ZI$$Base|       ; Start of ZI output section
-                IMPORT  |Image$$RW_IRAM1$$ZI$$Limit|      ; End of ZI output section
-                IMPORT  |Image$$RW_IRAM1$$ZI$$Length|     ; Size of ZI output section
-;******************** END ************************************************************************
-
-
-;**************************************************************************CALEB ADDED THIS
-Stack_Size      EQU     0x400;
+Stack_Size		EQU     0x400
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem       SPACE   Stack_Size
@@ -86,14 +54,12 @@ __initial_sp
 ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Heap_Size       EQU     0x200;
+Heap_Size      EQU     0x200
 
                 AREA    HEAP, NOINIT, READWRITE, ALIGN=3
 __heap_base
 Heap_Mem        SPACE   Heap_Size
 __heap_limit
-
-;***************************************************************************************
 
                 PRESERVE8
                 THUMB
@@ -104,10 +70,8 @@ __heap_limit
                 EXPORT  __Vectors
                 EXPORT  __Vectors_End
                 EXPORT  __Vectors_Size
-                ;IMPORT  |Image$$ARM_LIB_STACK$$ZI$$Limit|			// CALEB DID THIS___________
 
-__Vectors       ;DCD     |Image$$ARM_LIB_STACK$$ZI$$Limit| ; Top of Stack	// REMOVED THIS LINE	
-				DCD		__initial_sp			   ; Top of stack			// ADDED THIS LINE
+__Vectors       DCD     __initial_sp               ; Top of Stack
                 DCD     Reset_Handler              ; Reset Handler
                 DCD     NMI_Handler                ; NMI Handler
                 DCD     HardFault_Handler          ; Hard Fault Handler
@@ -220,48 +184,14 @@ __Vectors_Size  EQU  __Vectors_End - __Vectors
 ; Reset handler
 Reset_Handler    PROC
                  EXPORT  Reset_Handler             [WEAK]
-        ;IMPORT  SystemInit									; THIS WAS ME
+        IMPORT  SystemInit
         IMPORT  __main
 
-                 ;LDR     R0, =SystemInit					; ALSO ME
-                 ;BLX     R0
-				 
- ;******************** Added by Dr. Zhu *****************************************************
-				 ; Copy the RW Data from Flash to RAM 
-				 LDR	r0,	=|Image$$ER_IROM1$$RO$$Limit|
-				 LDR	r1,	=|Image$$RW_IRAM1$$RW$$Base|
-				 LDR	r3,	=|Image$$RW_IRAM1$$ZI$$Base|
-Copy_RW			 CMP	r1,	r3
-				 LDRCC r2, [r0], #4
-				 STRCC r2, [r1], #4
-				 BCC	Copy_RW
-		
-				 ; Copy the ZI Data from Flash to RAM
-				 LDR	r1,	=|Image$$RW_IRAM1$$ZI$$Limit|
-				 MOV	r2,	#0
-Initialize_ZI	 CMP	r3,	r1
-				 STRCC r2, [r3], #4
-				 BCC	Initialize_ZI
-
-				 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-				 ; Enable FPU
-				 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-				 ; CPACR is located at address 0xE000ED88
-				 LDR.W   R0, =0xE000ED88
-				 ; Read CPACR
-				 LDR     R1, [R0]
-				 ; Set bits 20-23 to enable CP10 and CP11 coprocessors
-				 ORR     R1, R1, #(0xF << 20)
-				 ; Write back the modified value to the CPACR
-				 STR     R1, [R0]; wait for store to complete
-				 DSB
-				 ;reset pipeline now the FPU is enabled
-				 ISB
-;******************** END ********************************************************************
+                 LDR     R0, =SystemInit
+                 BLX     R0
                  LDR     R0, =__main
                  BX      R0
                  ENDP
-				 
 
 ; Dummy Exception Handlers (infinite loops which can be modified)
 
@@ -465,7 +395,32 @@ SPI4_IRQHandler
 
                 ALIGN
 
-                END
+;*******************************************************************************
+; User Stack and Heap initialization
+;*******************************************************************************
+                 IF      :DEF:__MICROLIB
+
+                 EXPORT  __initial_sp
+                 EXPORT  __heap_base
+                 EXPORT  __heap_limit
+
+                 ELSE
+
+                 IMPORT  __use_two_region_memory
+                 EXPORT  __user_initial_stackheap
+
+__user_initial_stackheap
+
+                 LDR     R0, =  Heap_Mem
+                 LDR     R1, =(Stack_Mem + Stack_Size)
+                 LDR     R2, = (Heap_Mem +  Heap_Size)
+                 LDR     R3, = Stack_Mem
+                 BX      LR
+
+                 ALIGN
+
+                 ENDIF
+
+                 END
 
 ;************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE*****
-
