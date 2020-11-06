@@ -72,6 +72,7 @@ int serverOutput (unsigned char* buf){
 	
 	val |= (buf[1] << 8); 	// Upper Nibble
 	val |= (buf[2]);	// Lower Nibble
+		
 	
 	switch(buf[0]){
 	
@@ -102,7 +103,7 @@ int serverOutput (unsigned char* buf){
 			//printf("\n*** %s, %x%x ***\n", pkg, pkg[3], pkg[4]);
 			
 			break;
-		case 0x5: // DC motor y
+		case 0x2: // DC motor y
 			
 			pkg[0] = 'D';
 			
@@ -129,10 +130,43 @@ int serverOutput (unsigned char* buf){
 			
 			break;
 		case 0x6: // Stepper 
-			
+			if (val == 0x8001){
+			printf("true\n");
+				pkg[0] = 'S';
+				pkg[1] = 'T';
+				pkg[2] = ' ';
+				pkg[3] = 'L';
+				pkg[4] = '\0';
+			}
+
+			else{
+				pkg[0] = 'S';
+				pkg[1] = 'T';
+				pkg[2] = ' ';
+				pkg[3] = 'R';
+				pkg[4] = '\0';
+			}
+			sendPKG(pkg, strlen(pkg));
+
 			break;
 		case 0x7: // Servo
-			
+			if (val == 0x8001){
+				pkg[0] = 'S';
+				pkg[1] = 'V';
+				pkg[2] = ' ';
+				pkg[3] = 'U';
+				pkg[4] = '\0';
+			}
+
+			else{
+				pkg[0] = 'S';
+				pkg[1] = 'V';
+				pkg[2] = ' ';
+				pkg[3] = 'D';
+				pkg[4] = '\0';
+			}
+			sendPKG(pkg, strlen(pkg));
+
 			break;
 		case 0xe: // ping
 			
@@ -161,10 +195,6 @@ int serverOutput (unsigned char* buf){
 
 int sendPKG (unsigned char *buf, int len){
 	
-	printf("%s\n", buf);
-	for(int i = 0; i<len; i++){
-		printf("%c", buf[i]);
-	}
-	printf("\n");
+	printf("%s\n", buf); // Print out the buffer (what is going to be sent to the Nucelo)
 }
 
