@@ -22,8 +22,8 @@
 #define		STEP_PIN_D			3UL
 
 // Stepper Port
-#define		STEP_PORT				GPIOB
-#define		STEP_CLK				RCC_AHBENR_GPIOBEN
+#define		STEP_PORT				GPIOC
+#define		STEP_CLK				RCC_AHBENR_GPIOCEN
 
 // Step Type
 #define 	FULL_STEP				2

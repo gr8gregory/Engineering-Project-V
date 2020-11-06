@@ -78,5 +78,3 @@ void EXTI9_5_IRQHandler(void) {
 } // End EXTI8_IRQHandler
 
 
-// IRQ Right
-	// Check EXT9

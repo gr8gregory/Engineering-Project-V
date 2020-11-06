@@ -16,6 +16,7 @@ volatile uint8_t ledFlag = 0;
 
 
 // Function to enable timer clock
+	// Update to be more generic? Macro?
 void TIMER_CLOCK_ENABLE(void) {
 	
 	// Set timer 1 clock
