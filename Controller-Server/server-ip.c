@@ -36,6 +36,7 @@ main (int argc, char *argv[])
 	int client_len;
 	struct sockaddr_in client_addr, server_addr;
 	int len, i;
+	int opt = 1;
 	FILE *p;
 
 
@@ -62,14 +63,19 @@ main (int argc, char *argv[])
 	/*
 	 * initialize our server address info for binding purposes
 	 */
+	if ((setsockopt(server_socket,SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt , sizeof(opt))) ) {
+		printf ("Failed to set socket options!\n");
+		return 1;
+	}	/* endif */
 
 	memset (&server_addr, 0, sizeof (server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = htonl (INADDR_ANY);
 	server_addr.sin_port = htons (atoi(argv[1]));
 
-	if (bind (server_socket, (struct sockaddr *)&server_addr, 
-	sizeof (server_addr)) < 0) {
+	
+
+	if (bind (server_socket, (struct sockaddr *)&server_addr, sizeof (server_addr)) < 0) {
 		printf ("grrr, can't bind server socket\n");
 		close (server_socket);
 		return 2;
@@ -139,6 +145,5 @@ main (int argc, char *argv[])
 
 	return 0;
 }	/* end main */
-
 
 

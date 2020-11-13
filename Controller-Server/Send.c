@@ -1,6 +1,9 @@
 #include "server-ip.h"
+#include "serial.h"
 
 int sendPKG (unsigned char *buf, int len);
+
+char serialPath[] = "/dev/ttyS3";
 
 
 /* Gregs Controller Button Mapout
@@ -194,7 +197,8 @@ int serverOutput (unsigned char* buf){
 }
 
 int sendPKG (unsigned char *buf, int len){
-	
-	printf("%s\n", buf); // Print out the buffer (what is going to be sent to the Nucelo)
+	char * args[2];
+	args[1] = serialPath;
+	sendSerial(2,args,buf);
 }
 

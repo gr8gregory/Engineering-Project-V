@@ -7,6 +7,11 @@
  * October 2020
  ****************************************************************************/
 
+/* 
+ * THE HEARTBEAT TIMER IS ON TIMER 2.
+ */
+ 
+ 
 // Header files
 #include "heartbeat.h"
 
@@ -16,7 +21,8 @@ volatile uint8_t ledFlag = 0;
 
 
 // Function to enable timer clock
-void TIMER_CLOCK_ENABLE(void) {
+	// Update to be more generic? Macro?
+void TIMER_clock_enable(void) {
 	
 	// Set timer 1 clock
 	RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
@@ -28,7 +34,7 @@ void TIMER_CLOCK_ENABLE(void) {
 	// For now, this is the way to act on interrupts indicated by global vars
 void Heartbeat_Init(void) {
 	
-	TIMER_CLOCK_ENABLE();
+	TIMER_clock_enable();
 	
 	// Disable Timer
 	CLR_BITS(TIM2->CR1, TIM_CR1_CEN);

@@ -49,15 +49,10 @@
 #define		GPIOx_OP_TYPE(port, pin, mode)				FORCE_BITS((port->OTYPER), 1UL << (pin), (mode) << (pin))
 #define		GPIOx_PIN_SPEED(port, pin, speed)			FORCE_BITS((port->OSPEEDR), 3UL << (2*(pin)), (speed) << (2*(pin)))
 #define		GPIOx_PIN_PULL(port, pin, pull)				FORCE_BITS((port->PUPDR), 3UL << (2*(pin)), (pull) << (2*(pin)))
-// #define		GPIOA_PIN_MODE(pin, mode)				FORCE_BITS(GPIOA->MODER, 3UL << ((pin)*2UL), (mode) << ((pin)*2UL))
-// #define 		GPIOA_PIN_DRV_TYPE(pin, type)		FORCE_BITS(GPIOA->ODR, 1 << (pin), (type) << (pin))
-// #define		GPIOA_OP_TYPE(pin, mode)				FORCE_BITS(GPIOA->OTYPER, 1UL << (pin), (mode) << (pin))
-// #define		GPIOA_PIN_SPEED(pin, speed)			FORCE_BITS(GPIOA->OSPEEDR, 3UL << (2*(pin)), (speed) << (2*(pin)))
-// #define		GPIOA_PIN_PULL(pin, pull)				FORCE_BITS(GPIOA->PUPDR, 3UL << (2*(pin)), (pull) << (2*(pin)))
 
 
 // Function Prototypes
-void GPIO_CLOCK_ENABLE(volatile uint32_t port);
+void GPIO_clock_enable(volatile uint32_t port);
 void GPIOA_Init(void);
 
 #endif
