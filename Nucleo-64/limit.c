@@ -19,13 +19,14 @@
 // Global Variables
 volatile uint8_t leftLimitFlag;		// Indicates left limit reached
 volatile uint8_t rightLimitFlag; 	// Indicates right limit reached
+uint8_t startup = 1;							// Indicates startup or not
 
 
 // Init LimSws
 void limit_Init(void) {
 	
 	// Start clock
-	GPIO_CLOCK_ENABLE(LIMIT_CLK);
+	GPIO_clock_enable(LIMIT_CLK);
 	
 	// Set up left limit pin
 	GPIOx_PIN_MODE(LIMIT_PORT, LEFT_LIM_PIN, MODER_IN);
@@ -54,7 +55,7 @@ void limit_Init(void) {
 	EXTI->IMR |= EXTI_IMR_IM8;     // 0 = marked, 1 = not masked (i.e., enabled)
 	EXTI->IMR |= EXTI_IMR_IM9;
 	
-	// Rising trigger selection
+	// Rising trigger selection (trigger on rising edge)
 	EXTI->RTSR |= EXTI_RTSR_RT8;     // 0 = trigger disabled, 1 = trigger enabled
 	EXTI->RTSR |= EXTI_RTSR_RT9;
 
@@ -69,11 +70,27 @@ void EXTI9_5_IRQHandler(void) {
 	if ((EXTI->PR & EXTI_PR_PIF8) == EXTI_PR_PIF8) {
 		EXTI->PR = EXTI_PR_PIF8; 		// Clear the interrupt
 		leftLimitFlag = 1;
-	}
+		
+		// Only true if there is a problem
+		if (!startup) {
+			leftLimitFlag = 0;
+			stepHome();
+			
+		} // End if
+	} // End if
+	
+	// Check EXT9
 	if ((EXTI->PR & EXTI_PR_PIF9) == EXTI_PR_PIF9) {
 		EXTI->PR = EXTI_PR_PIF9; 		// Clear the interrupt
 		rightLimitFlag = 1;
-	}	
+		
+		// Only true if there is a problem
+		if (!startup) {
+			rightLimitFlag = 0;
+			stepHome();
+			
+		} // End if
+	} // End if
 	
 } // End EXTI8_IRQHandler
 

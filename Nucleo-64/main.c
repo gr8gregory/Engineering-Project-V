@@ -8,6 +8,10 @@
  * October 2020
  **************************************************************************/
 
+/*
+ * MAYBE ADD A "KILL" COMMAND TO STOP EVERYTHING IF NECESSARY
+ */
+
 
 // Header files
 #include "virtualPort.h"
@@ -16,6 +20,7 @@
 #include "Heartbeat.h"
 #include "stepper.h"
 #include "limit.h"
+#include "servo.h"
 
 // Global variables
 extern volatile uint8_t rxFlag;													// Indicates serial input (command input)
@@ -44,6 +49,8 @@ int main(void) {
 	limit_Init();							// Set up limit switches
 	stepper_Init();						// Set up stepper motor
 	
+	servo_Init();
+	
 	Heartbeat_Init();					// Set up the heartbeat timer (Currently reads any input-related ISRs)
 	DisableInterrupts; 				// Don't want to catch anything from the heartbeat yet
 	
@@ -65,6 +72,7 @@ int main(void) {
 	vportPrintf("Flip LED: f,F\n\r");
 	vportPrintf("Ping Board: P (should return \"p\")\n\r");
 	vportPrintf("Move stepper motor: S #### (leading 0s)\n\r");
+	vportPrintf("Move stepper motor: T #### (leading 0s)\n\r");
 	vportPrintf("Press return to terminate ALL commands\r\n\n");
 	// Add other commands as needed
 	Delay_ms(20);									// Delay to write
@@ -115,10 +123,42 @@ uint8_t prompt(void) {
 						break;
 					
 					// Expects and ASSUMES input in the form " S ####"
-					case('S'):
+					case('T'):
 						clearInput();
 						EnableInterrupts;
 					
+						for(int i = 3; i < 7; i++) { 
+							
+							if ((vportInput[i] - ASCII_0) < 10) {						// Guaranteed to be gt 0 since unsigned uints wrap around
+								stepGoToPos_deg += (vportInput[i] - ASCII_0) * pow_ten[i-3];
+								error = 0;
+							} // End if
+							
+							else {
+								vportPrintf("\n\rInput isn't a number.\n\r");
+								error = 1;
+							} // End else
+						} // End for
+						
+						vportPrintf("\n\rt %d\n\r", stepGoToPos_deg);
+						
+						if ((stepGoToPos_deg > FULL_UP_DEG)) {
+							vportPrintf("\n\rInput out of range! Servo isn't moving.\n\r");
+							error = 1;
+						} // End if
+						
+						else {
+							servoSet(stepGoToPos_deg);
+							// stepGoToPos_step = (stepCount_step * stepGoToPos_deg)/FULL_RIGHT_DEG;
+							error = 0;
+						}
+						break;
+						
+					// Expects and ASSUMES input in the form S ####
+					case('S'):
+						clearInput();
+						EnableInterrupts;
+						
 						for(int i = 3; i < 7; i++) { 
 							
 							if ((vportInput[i] - ASCII_0) < 10) {						// Guaranteed to be gt 0 since unsigned uints wrap around

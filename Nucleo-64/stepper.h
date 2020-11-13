@@ -30,7 +30,7 @@
 #define		HALF_STEP				1
 
 // Timer function prototypes
-static void STEP_CLOCK_Init(void);
+static void step_clock_Init(void);
 void stepper_Init(void);
 void TIM3_IRQHandler(void);
 void stepHome(void);

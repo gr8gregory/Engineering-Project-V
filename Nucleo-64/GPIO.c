@@ -12,7 +12,7 @@
 
 
 // Initalize the GPIO Clocks
-void GPIO_CLOCK_ENABLE(volatile uint32_t port) {
+void GPIO_clock_enable(volatile uint32_t port) {
 	
 	// Enable GPIO port clock
 	RCC->AHBENR |= port;
@@ -23,15 +23,15 @@ void GPIO_CLOCK_ENABLE(volatile uint32_t port) {
 // Set up GPIOA with VPORT_RX_PIN and VPORT_TX_PIN for terminal input and echo
 void GPIOA_Init(void) {
 	
-	GPIO_CLOCK_ENABLE(VPORT_CLK);
+	GPIO_clock_enable(VPORT_CLK);
 	
 	// Set pin mode (AF7 - USART2)
 	GPIOx_PIN_MODE(VIRT_PORT, VPORT_TX_PIN, MODER_AF);
 	GPIOx_PIN_MODE(VIRT_PORT, VPORT_RX_PIN, MODER_AF);
-	GPIOA->AFR[0] &= ~(0x3UL)<<(VPORT_RX_PIN *4);
-	GPIOA->AFR[0] &= ~(0x3UL)<<(VPORT_TX_PIN *4);
-	GPIOA->AFR[0] |= 7UL<<(VPORT_RX_PIN *4);
-	GPIOA->AFR[0] |= 7UL<<(VPORT_TX_PIN *4);
+	VIRT_PORT->AFR[0] &= ~(0x3UL)<<(VPORT_RX_PIN *4);
+	VIRT_PORT->AFR[0] &= ~(0x3UL)<<(VPORT_TX_PIN *4);
+	VIRT_PORT->AFR[0] |= 7UL<<(VPORT_RX_PIN *4);
+	VIRT_PORT->AFR[0] |= 7UL<<(VPORT_TX_PIN *4);
 	
 	// Set pin speed
 	GPIOx_PIN_SPEED(VIRT_PORT, VPORT_TX_PIN, HI_SPEED);

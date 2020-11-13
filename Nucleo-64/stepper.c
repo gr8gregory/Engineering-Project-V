@@ -13,9 +13,9 @@
  * 		Pin C: PC2
  * 		Pin D: PC3
  *
- * For now, the step type is set by the global variable
- *
- * We chose right to be the positive direction and left to be the negative direction
+ * The step type is set by the global variable. We chose right to be the 
+ *	 positive direction and left to be the negative direction.
+ * THE STEPPER MOTOR IS UPDATED BASED ON TIMER 3.
  *
  * step = (stepCount_step/FULL_RIGHT_DEG) * degs
  * degs = (stepCount_step/FULL_RIGHT_DEG) * step
@@ -45,7 +45,7 @@ static uint8_t stepType = FULL_STEP;
 void stepper_Init(void) {
 	
 	// Set up GPIO pins
-	GPIO_CLOCK_ENABLE(STEP_CLK);												// Turn on port clock
+	GPIO_clock_enable(STEP_CLK);												// Turn on port clock
 	
 	GPIOx_PIN_MODE(STEP_PORT, STEP_PIN_A, MODER_OUT);
 	GPIOx_OP_TYPE( STEP_PORT, STEP_PIN_A, PUSH_PULL);
@@ -65,7 +65,7 @@ void stepper_Init(void) {
 	
 	// Home the stepper motor
 	stepHome();
-	STEP_CLOCK_Init();
+	step_clock_Init();
 
 } // End stepper_Init
 
@@ -120,7 +120,7 @@ void stepHome(void) {
 
 
 // Set up timer for checking motor (ISR)
-static void STEP_CLOCK_Init(void) {
+static void step_clock_Init(void) {
 	
 	RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;	// TIMER_CLOCK_ENABLE();
 	

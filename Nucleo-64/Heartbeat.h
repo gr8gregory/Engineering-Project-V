@@ -37,9 +37,6 @@
 #define		OP_OF					0x0UL
 #define		OP_ON					TIM_BDTR_MOE
 
-// Pins
-#define		SERVO_PIN			8UL
-
 // Timer macros
 #define		COUNT_DIR(timer, dir)		FORCE_BITS((timer), TIM_CR1_DIR_Pos, (dir))
 #define		TIM1_MODE(mode)					FORCE_BITS(TIM1->CCMR1, TIM_CCMR1_OC1M, (mode))
@@ -49,7 +46,7 @@
 
 
 // Timer function prototypes
-void TIMER_CLOCK_ENABLE(void);
+void TIMER_lclock_enable(void);
 void Heartbeat_Init(void);
 void TIM2_IRQHandler(void);
 
