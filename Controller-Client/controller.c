@@ -1,6 +1,9 @@
 /*
- * Team: Smooth Brains. 
- * 	Members: Gregory Huras, Caleb Hoeksema, Andrew Sammut
+ * 	controller.c
+ * 		Read the value from the joystick hooked up to personal machine in a Virtual Machine enviroment
+ *		Send the read value to the client to be sent off to the server.	
+ *
+ * 	Author: Gregory Huras,
  *	
  *	Sources for controller Code: https://kusemanohar.info/2015/12/19/programming-with-joystick-on-linux/ 
  */
@@ -21,15 +24,11 @@
 #define JS_EVENT_AXIS          0x02    /* joystick moved */
 #define JS_EVENT_INIT		0x80    /* initial state of device */
 
-/* Which user and Controller is being used (each controller would have a different button map out)*/
-#define GREG
-//#define CALEB
-//#define ANDREW
 
 /* Joy Stick Event strucuct */
 struct js_event {
 	unsigned int time;	/* event timestamp in milliseconds */
-	short value;   	/* value */
+	unsigned short value;  /* value */
 	unsigned char type;	/* event type */
 	unsigned char number;	/* axis/button number */
 };
@@ -74,6 +73,8 @@ int controller (void){
 		if( event.type == JS_EVENT_BUTTON || event.type == JS_EVENT_AXIS ){
 			
 			// If the button is pressed
+			
+			
 			if( event.type == JS_EVENT_BUTTON ){ 
 				
 				/* Send the event number (corresponds to which button or axis is being pressed) and send the read value and a flag indicating its a button being read
@@ -87,7 +88,9 @@ int controller (void){
 				/* Send the event number (corresponds to which button or axis is being pressed) and send the read value and a flag indicating its an axis being read
 				 *
 				 */
-				status = command(event.number, event.value, 1);	
+				if((event.value > 0x4000) && (event.value < 0xC000)){
+					status = command(event.number, event.value, 1);	
+				}
 			}
 		}
 		
@@ -137,7 +140,6 @@ int controller (void){
 
 int command (u_int16_t number, u_int16_t value, int Periferal){
 	
-	#ifdef GREG
 	
 	// Set the cmd Char to 0
 	cmd = 0x0;
@@ -149,31 +151,34 @@ int command (u_int16_t number, u_int16_t value, int Periferal){
 		// 6 different axis's to read from
 		switch(number){ 
 			
-			case 0:
+			/*case 0:
 				cmd = 0x1;
 				val = value;
 				
 				break;
+			*/
 				
-			case 1:
+			case 1: // Left stick Y direction
 				cmd = 0x2;
 				val = value;
 				break;
 				
-			case 2:
+			/*case 2:
 				cmd = 0x3;
 				val = value;
 				break;
-				
-			case 3:
+			*/	
+			
+			case 3: // Right stick X direction
 				cmd = 0x4;
 				val = value;
 				break;
 				
-			case 4:
+			/*case 4:
 				cmd = 0x5;
 				val = value;
 				break;
+			*/
 				
 			case 5:
 				cmd = 0x6;
@@ -251,15 +256,7 @@ int command (u_int16_t number, u_int16_t value, int Periferal){
 	if (cmd != 0x0){
 			sendCMD(cmd,val);
 	}
-	#endif
 	
-	#ifdef CALEB
-	// Some switch statement paired with their controller
-	#endif
-	
-	#ifdef ANDREW
-	// Some switch statement paried with their controller
-	#endif
 	
 	return 0;
 }
