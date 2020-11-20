@@ -45,10 +45,11 @@
 
 // GPIOA macros
 #define 	GPIOx_PIN_MODE(port, pin, mode)				FORCE_BITS((port->MODER), 3UL << ((pin)*2UL), (mode) << ((pin)*2UL))
-#define 	GPIOx_PIN_DRV_TYPE(port, pin, type)		FORCE_BITS((port->ODR), 1 << (pin), (type) << (pin))
+#define 	GPIOx_PIN_DRV_TYPE(port, pin, type)		FORCE_BITS((port->ODR), 1UL << (pin), (type) << (pin))
 #define		GPIOx_OP_TYPE(port, pin, mode)				FORCE_BITS((port->OTYPER), 1UL << (pin), (mode) << (pin))
-#define		GPIOx_PIN_SPEED(port, pin, speed)			FORCE_BITS((port->OSPEEDR), 3UL << (2*(pin)), (speed) << (2*(pin)))
-#define		GPIOx_PIN_PULL(port, pin, pull)				FORCE_BITS((port->PUPDR), 3UL << (2*(pin)), (pull) << (2*(pin)))
+#define		GPIOx_PIN_SPEED(port, pin, speed)			FORCE_BITS((port->OSPEEDR), 3UL << (2UL*(pin)), (speed) << (2UL*(pin)))
+#define		GPIOx_PIN_PULL(port, pin, pull)				FORCE_BITS((port->PUPDR), 3UL << (2UL*(pin)), (pull) << (2UL*(pin)))
+#define 	GPIOx_AF_MODE(port, pin, mode)				FORCE_BITS((port->AFR[0]), 0xFUL << ((pin)*4UL), (mode) << ((pin)*4UL))
 
 
 // Function Prototypes

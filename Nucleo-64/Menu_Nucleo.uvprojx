@@ -492,6 +492,11 @@
               <FileType>1</FileType>
               <FilePath>.\servo.c</FilePath>
             </File>
+            <File>
+              <FileName>timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\timer.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

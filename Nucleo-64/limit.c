@@ -20,6 +20,7 @@
 volatile uint8_t leftLimitFlag;		// Indicates left limit reached
 volatile uint8_t rightLimitFlag; 	// Indicates right limit reached
 uint8_t startup = 1;							// Indicates startup or not
+uint8_t limitsFlipped = 0;				// Indicates if limts are reversed between HW and SW
 
 
 // Init LimSws

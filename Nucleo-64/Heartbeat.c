@@ -34,28 +34,35 @@ void TIMER_clock_enable(void) {
 	// For now, this is the way to act on interrupts indicated by global vars
 void Heartbeat_Init(void) {
 	
+	// NON-GENERIC------------------------------------------------
 	TIMER_clock_enable();
+	// ---------------------------------------------------------
 	
 	// Disable Timer
-	CLR_BITS(TIM2->CR1, TIM_CR1_CEN);
+	TIMx_ENABLE(HRT_TIM, TIMER_OFF);
+	// CLR_BITS(TIM2->CR1, TIM_CR1_CEN);
 	
 	// Clock Prescale (16 bits - up to 65 535)
-	TIM2->PSC = 71;					// 72MHz clock --> clock/(PSC+1) = 1MHz, matches useconds
+	HRT_TIM->PSC = 71;					// 72MHz clock --> clock/(PSC+1) = 1MHz, matches useconds
 	
 	// Auto-reload (also 16b)
-	TIM2->ARR = 2000-1;			// 1MHz clock (see above), period = 2ms --> ARR = clock*period - 1
+	HRT_TIM->ARR = 2000-1;			// 1MHz clock (see above), period = 2ms --> ARR = clock*period - 1
 	
 	// Count direction
-	COUNT_DIR(TIM2->CR1, COUNT_UP);
+	TIMx_COUNT_DIR(HRT_TIM, TIM_CNT_UP);
+	// COUNT_DIR(TIM2->CR1, 0UL);
 	
+	// NON-GENERIC------------------------------------------------
 	// Enable interrupts
 	SET_BITS(TIM2->DIER, TIM_DIER_UIE);
 	
 	// Enable TIM2 in NVIC
 	NVIC_EnableIRQ(TIM2_IRQn);
+	// -----------------------------------------------------------
 	
-	// Enable timer 1
-	SET_BITS(TIM2->CR1, TIM_CR1_CEN);
+	// Enable Timer
+	TIMx_ENABLE(HRT_TIM, TIMER_ON);
+	// SET_BITS(TIM2->CR1, TIM_CR1_CEN);
 	
 } // End Heartbeat_Init
 

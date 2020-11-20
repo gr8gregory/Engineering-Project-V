@@ -32,6 +32,7 @@ uint32_t stepCount_step = 0;									// Same range as stepCurPos
 uint16_t overflow = 0;
 extern volatile uint8_t leftLimitFlag;				// Indicates left limit reached
 extern volatile uint8_t rightLimitFlag; 			// Indicates right limit reached
+extern volatile uint8_t limitsFlipped;				// Indicates reversal between SW and HW
 static const uint8_t halfStep[8] = {0x9, 0x8, 0xa, 0x2, 0x6, 0x4, 0x5, 0x1};		// Declared here, for use in the stepper ISR and homing
 volatile uint8_t nextStep = 0;								// Offset into halfStep[]
 
@@ -78,28 +79,63 @@ void stepHome(void) {
 	// We don't want the stepper motor to move from here on
 	stepGoToPos_step = stepCurPos_step = 0;
 	
-	// Move full left, checking for limit
-	while(!leftLimitFlag) {
+	// Step and check both flags while moving full left
+	while((!leftLimitFlag) && (!rightLimitFlag)) {
 		nextStep = (nextStep - stepType) & 0x7;		// Mask out any overflow over 8
 		takeStep = halfStep[nextStep];						// Get desired bit pattern
 		FORCE_BITS(STEP_PORT->ODR, 0xF, takeStep);
 	}
-	leftLimitFlag = 0;													// Reset the flag
 	
-	// Move  full right, checking for limit (we chose right to be the positive direction)
-	while(!rightLimitFlag) {
-		nextStep = (nextStep + stepType) & 0x7;		// Mask out any overflow over 8
-		takeStep = halfStep[nextStep];						// Get desired bit pattern
-		FORCE_BITS(STEP_PORT->ODR, 0xF, takeStep);
+	// Deal with flags and wiring
+	if (leftLimitFlag)													// If properly wired
+		leftLimitFlag = 0;
+	
+	else if (rightLimitFlag) {									// If wired backwards
+		rightLimitFlag = 1;
+		limitsFlipped = 1;
+	} // End else if
+	
+	else {}
+		// Something is really wrong if it gets here...
+	
+	// Finish homing the motor
+	if (!limitsFlipped) {
 		
-		if (stepCount_step >= UINT32_MAX) {
-			overflow++;
-			stepCount_step = 0;
-		} // End if
-		else
-			stepCount_step++;
-	}
-	rightLimitFlag = 0;													// Reset the flag
+		// Move  full right, checking for limit (we chose right to be the positive direction)
+		while(!rightLimitFlag) {
+			nextStep = (nextStep + stepType) & 0x7;		// Mask out any overflow over 8
+			takeStep = halfStep[nextStep];						// Get desired bit pattern
+			FORCE_BITS(STEP_PORT->ODR, 0xF, takeStep);
+			
+			if (stepCount_step >= UINT32_MAX) {
+				overflow++;
+				stepCount_step = 0;
+			} // End if
+			else
+				stepCount_step++;
+		}
+		rightLimitFlag = 0;													// Reset the flag
+	
+	} // End if
+	
+	else {																				// We are calling left right and right left
+		
+		// Move  full right, checking for limit (we chose right to be the positive direction)
+		while(!leftLimitFlag) {
+			nextStep = (nextStep + stepType) & 0x7;		// Mask out any overflow over 8
+			takeStep = halfStep[nextStep];						// Get desired bit pattern
+			FORCE_BITS(STEP_PORT->ODR, 0xF, takeStep);
+			
+			if (stepCount_step >= UINT32_MAX) {
+				overflow++;
+				stepCount_step = 0;
+			} // End if
+			else
+				stepCount_step++;
+		}
+		leftLimitFlag = 0;													// Reset the flag
+
+	} // End else
 	
 	DisableInterrupts;													// Otherwise the interrupt will start moving the motor (maybe let the interrupt do this later?)
 		stepCurPos_step = stepCount_step;						// Set position so we can move the motor
@@ -134,7 +170,7 @@ static void step_clock_Init(void) {
 	TIM3->ARR = 1000-1;			//1MHz clock (see above), period = 1ms --> ARR = clock*period - 1		// TIM2->ARR = 2000-1;
 	
 	// Count direction
-	COUNT_DIR(TIM3->CR1, COUNT_UP);			// COUNT_DIR(TIM2->CR1, COUNT_UP);
+	COUNT_DIR(TIM3->CR1, 0UL);			// COUNT_DIR(TIM2->CR1, COUNT_UP);
 	
 	// Enable interrupts
 	SET_BITS(TIM3->DIER, TIM_DIER_UIE);	// SET_BITS(TIM2->DIER, TIM_DIER_UIE);

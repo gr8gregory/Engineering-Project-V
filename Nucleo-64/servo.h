@@ -13,14 +13,17 @@
 
 #include "heartbeat.h"
 #include "limit.h"
+#include "timer.h"
 
 
 // Servo Pin
-#define		SERVO_PIN			0UL
+#define		SERVO_PIN				0UL
 
 // Servo Port
 #define		SERVO_PORT			GPIOB
 #define		SERVO_CLK				RCC_AHBENR_GPIOBEN
+#define 	SERVO_TIM				TIM1
+#define		SERVO_AF6				0x6UL
 
 // PWM Constants
 #define		PULSE_MIN				600UL			// In useconds, corresponds to 0 deg
