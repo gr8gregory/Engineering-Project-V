@@ -11,9 +11,8 @@
 #ifndef _SERVO_H
 #define _SERVO_H
 
-#include "heartbeat.h"
-#include "limit.h"
 #include "timer.h"
+#include "GPIO.h"
 
 
 // Servo Pin
@@ -35,9 +34,8 @@
 #define 	FULL_UP_DEG			180UL
 
 // Timer function prototypes
-static void servo_clock_Init(void);
 void servo_Init(void);
-void TIM1_IRQHandler(void);
 void servoSet(uint16_t);
+static void servo_clock_Init(void);
 
 #endif

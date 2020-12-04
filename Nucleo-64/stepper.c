@@ -39,9 +39,6 @@ volatile uint8_t nextStep = 0;								// Offset into halfStep[]
 static uint8_t stepType = FULL_STEP;
 
 
-// Set up limit switches
-
-
 // Home stepper motor on initialization
 void stepper_Init(void) {
 	
@@ -68,7 +65,7 @@ void stepper_Init(void) {
 	stepHome();
 	step_clock_Init();
 
-} // End stepper_Init
+} // End stepper_Init()
 
 
 void stepHome(void) {
@@ -152,36 +149,37 @@ void stepHome(void) {
 	
 	EnableInterrupts;														// Motor homed, system can resume control
 	
-} // End stepHome
+} // End stepHome()
 
 
 // Set up timer for checking motor (ISR)
 static void step_clock_Init(void) {
 	
+	// Enable the clock-------------------------------------------
 	RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;	// TIMER_CLOCK_ENABLE();
 	
 	// Disable Timer
-	CLR_BITS(TIM3->CR1, TIM_CR1_CEN);		// CLR_BITS(TIM2->CR1, TIM_CR1_CEN);
+	TIMx_ENABLE(STEP_TIM, TIMER_OFF);
 	
 	// Clock Prescale (16 bits - up to 65 535)
-	TIM3->PSC = 71;					//72MHz clock --> clock/(PSC+1) = 1MHz, matches useconds						// TIM2->PSC = 71;
+	STEP_TIM->PSC = 71;				//72MHz clock --> clock/(PSC+1) = 1MHz, matches useconds
 	
 	// Auto-reload (also 16b)
-	TIM3->ARR = 1000-1;			//1MHz clock (see above), period = 1ms --> ARR = clock*period - 1		// TIM2->ARR = 2000-1;
+	STEP_TIM->ARR = 1000-1;		//1MHz clock (see above), period = 1ms --> ARR = clock*period - 1
 	
 	// Count direction
-	COUNT_DIR(TIM3->CR1, 0UL);			// COUNT_DIR(TIM2->CR1, COUNT_UP);
-	
+	TIMx_COUNT_DIR(STEP_TIM, TIM_CNT_UP);
+
 	// Enable interrupts
-	SET_BITS(TIM3->DIER, TIM_DIER_UIE);	// SET_BITS(TIM2->DIER, TIM_DIER_UIE);
+	SET_BITS(STEP_TIM->DIER, TIM_DIER_UIE);
 	
-	// Enable TIM2 in NVIC
-	NVIC_EnableIRQ(TIM3_IRQn);					// NVIC_EnableIRQ(TIM2_IRQn);
+	// Enable TIM2 in NVIC-------------------------------------------
+	NVIC_EnableIRQ(TIM3_IRQn);
 	
 	// Enable timer 1
-	SET_BITS(TIM3->CR1, TIM_CR1_CEN);		// SET_BITS(TIM2->CR1, TIM_CR1_CEN);
+	SET_BITS(STEP_TIM->CR1, TIM_CR1_CEN);
 	
-} // End STEP_CLOCK_Init
+} // End STEP_CLOCK_Init()
 	
 
 // Check motor on timer rising edge
@@ -189,7 +187,7 @@ static void step_clock_Init(void) {
 void TIM3_IRQHandler(void) {
 	
 	// Check if the timer has overflowed
-	if((TIM3->SR & TIM_SR_UIF) != 0) {
+	if((STEP_TIM->SR & TIM_SR_UIF) != 0) {
 		
 		// Do we need to move the stepper motor
 			// Full left is 0, full right is max
@@ -210,7 +208,7 @@ void TIM3_IRQHandler(void) {
 		} // End if
 		
 	} // End if
-	TIM3->SR &= ~TIM_SR_UIF; 			// Clear interrupt request to clear
+	STEP_TIM->SR &= ~TIM_SR_UIF; 			// Clear interrupt request to clear
 	
 } // End TIM2_IRQHandler
 

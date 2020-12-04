@@ -21,39 +21,43 @@ void LED_Init(void){
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 	
 	// GPIO Mode
-	GPIOx_PIN_MODE(VIRT_PORT, LED_PIN, MODER_OUT);
+	GPIOx_PIN_MODE(LED_PORT, LED_PIN, MODER_OUT);
 	
 	// GPIO Speed
-	GPIOx_PIN_SPEED(GPIOA, LED_PIN, HI_SPEED);
+	GPIOx_PIN_SPEED(LED_PORT, LED_PIN, HI_SPEED);
 	
 	// GPIO Output Type 
-	GPIOx_OP_TYPE(GPIOA, LED_PIN, PUSH_PULL);
+	GPIOx_OP_TYPE(LED_PORT, LED_PIN, PUSH_PULL);
 	
 	// GPIO Push-Pull
-	GPIOx_PIN_PULL(GPIOA, LED_PIN, PULL_NONE);
+	GPIOx_PIN_PULL(LED_PORT, LED_PIN, PULL_NONE);
 	
-} // End LED_Init
+} // End LED_Init()
 
 
 // Fucntion to turn on LED
-void Red_LED_On(void){
+void LED_On(void){
 	
-	GPIOA->ODR |= GPIO_ODR_5;
+	GPIOx_PIN_MODE(LED_PORT, LED_PIN, LED_ON);
+	// SET_BITS(LED_PORT->ODR, LED_PIN);
+	// LED_PORT->ODR |= GPIO_ODR_5;
 	
-} // End Red_LED_On
+} // End LED_On()
 
 
 // Function to turn off LED
-void Red_LED_Off(void){
+void LED_Off(void){
 	
-	GPIOA->ODR &= ~GPIO_ODR_5;
+	GPIOx_PIN_MODE(LED_PORT, LED_PIN, LED_OFF);
+	// CLR_BITS(LED_PORT->ODR, LED_PIN);
+	// GPIOA->ODR &= ~GPIO_ODR_5;
 	
-} // End Red_LED_Off
+} // End LED_Off()
 
 
-// Funciton to toggle LED state
-void Red_LED_Toggle(void){
+// Funciton to toggle LED state (NON-GENERIC!)
+void LED_Toggle(void){
 	
-	GPIOA->ODR ^= GPIO_ODR_5;
+	LED_PORT->ODR ^= GPIO_ODR_5;
 
-} // End Red_LED_Toggle
+} // End LED_Toggle()

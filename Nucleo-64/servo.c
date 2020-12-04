@@ -11,7 +11,7 @@
  * 		Pin PB0
  *
  * We chose up to be the positive direction and down to be the negative direction
- * THE SERVO IS RUNNING ON TIMER 1
+ * THE SERVO IS RUNNING ON TIMER 1 CHANNEL 2N
  *
  * Full down: 0 deg
  * Full up: 180deg
@@ -56,7 +56,7 @@ void servoSet(uint16_t angle) {
 	pulse = (angle * 10) + PULSE_MIN;
 	
 	// Write port
-	TIM1->CCR2 = pulse;
+	SERVO_TIM->CCR2 = pulse;
 	
 	// Write servo_curpos_deg and servo_curpos_sec (ditch other vars)
 	servoCurPos_deg = angle;
@@ -72,12 +72,9 @@ static void servo_clock_Init(void) {
 	
 	// Disable Timer
 	TIMx_ENABLE(SERVO_TIM, TIMER_OFF);
-	// CLR_BITS(SERVO_TIM->CR1, TIM_CR1_CEN);
 	
 	// Count direction
-	// TIM1->CR1 &= COUNT_UP;
 	TIMx_COUNT_DIR(SERVO_TIM, TIM_CNT_UP);
-	//COUNT_DIR(SERVO_TIM->CR1, COUNT_UP);
 	
 	// Clock Prescale (16 bits - up to 65 535)
 	SERVO_TIM->PSC = 71;					//72MHz clock --> clock/(PSC+1) = 1MHz, matches useconds
@@ -101,12 +98,10 @@ static void servo_clock_Init(void) {
 	
 	// Main OP enable
 	TIMx_OP_ENABLE(SERVO_TIM, TIM_OP_ON);
-	// OP_ENABLE(OP_ON); // FORCE_BITS(TIM1->BDTR, TIM_BDTR_MOE, (mode))
 	
 	// Enable Timer
 	TIMx_ENABLE(SERVO_TIM, TIMER_ON);
-	// SET_BITS(TIM1->CR1, TIM_CR1_CEN);		// SET_BITS(TIM2->CR1, TIM_CR1_CEN);
 	
-} // End STEP_CLOCK_Init
+} // End STEP_CLOCK_Init()
 	
 

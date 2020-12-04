@@ -19,9 +19,10 @@ volatile uint8_t rxFlag = 0;										// Indicates if there is input
 
 
 // Function to initialize a virtual port for control and debugging
-	// For STM32F303RET6 (Nucleo46), PA2 is Tx and PA3 is Rx (USART2)
+	// For STM32F303RET6 (Nucleo64), PA2 is Tx and PA3 is Rx (USART2)
 void virtualPortInit(void) {
 	
+	// ---------------------------------------------------------------
 	// Start the USART2 clock
 	SET_BITS(RCC->APB1ENR, RCC_APB1ENR_USART2EN);
 	
@@ -31,34 +32,33 @@ void virtualPortInit(void) {
 	// 10: HSI16 clock selected as USART2 clock
 	// 11: LSE clock selected as USART2 clock
 	FORCE_BITS( RCC->CFGR3, RCC_CFGR3_USART2SW, RCC_CFGR3_USART2SW_SYSCLK );
+	// ------------------------------------------------------------------
 	
-	// Configure the required pins
-	GPIOA_Init();
+	// Configure the required pins	
+	GPIO_clock_enable(VPORT_CLK);
+	
+	// Set pin mode (AF7 - USART2)
+	GPIOx_PIN_MODE(VIRT_PORT, VPORT_TX_PIN, MODER_AF);
+	GPIOx_PIN_MODE(VIRT_PORT, VPORT_RX_PIN, MODER_AF);
+	GPIOx_AF_MODE(VIRT_PORT, VPORT_TX_PIN, VPORT_AF7);
+	GPIOx_AF_MODE(VIRT_PORT, VPORT_RX_PIN, VPORT_AF7);
+	
+	// Set pin speed
+	GPIOx_PIN_SPEED(VIRT_PORT, VPORT_TX_PIN, HI_SPEED);
+	GPIOx_PIN_SPEED(VIRT_PORT, VPORT_RX_PIN, HI_SPEED);
+	
+	// Set push pull
+	GPIOx_PIN_PULL(VIRT_PORT, VPORT_TX_PIN, PULL_UP);
+	GPIOx_PIN_PULL(VIRT_PORT, VPORT_RX_PIN, PULL_UP);
+	
+	// Set output type
+	GPIOx_PIN_DRV_TYPE(VIRT_PORT, VPORT_TX_PIN, PUSH_PULL);
+	GPIOx_PIN_DRV_TYPE(VIRT_PORT, VPORT_RX_PIN, PUSH_PULL);
 	
 	// Initialize USART2
 	usartInit(USART2);
 	
 }	// End virtualPortInit();
-
-
-// Interrupt handler for virtual port recieve
-void USART2_IRQHandler(void) {
-	
-	uint8_t junk = 0;													// For catching invalid requests (may cause a warning)
-	if (USART2->ISR & USART_ISR_RXNE) {				// Check if there is actually something there
-		
-		vportOffset++;													// Move to next byte in buffer
-		if (vportOffset >= MAX_SER_BUF_SIZE)		// Overwrite the start of the buffer
-			vportOffset = 0;
-		
-		rxFlag++;																// Set flag
-		vportInput[vportOffset] = USART2->RDR;	// Read, acknowledge ISR
-		
-	}	// End if
-	
-	junk = USART2->RDR;												// Acknowledge the interrupt request if called invalidly
-	
-}	// End USART2_IRQHandler
 
 
 /* Functions for sending data from the processor to the terminal */
@@ -94,3 +94,24 @@ static void vportPutc(char c) {
 	USART2->TDR = (uint8_t)c;									// Data output
 	
 }	// End vportPutc()
+
+
+// Interrupt handler for virtual port recieve
+void USART2_IRQHandler(void) {
+	
+	uint8_t junk = 0;													// For catching invalid requests (may cause a warning)
+	if (USART2->ISR & USART_ISR_RXNE) {				// Check if there is actually something there
+		
+		vportOffset++;													// Move to next byte in buffer
+		if (vportOffset >= MAX_SER_BUF_SIZE)		// Overwrite the start of the buffer
+			vportOffset = 0;
+		
+		rxFlag++;																// Set flag
+		vportInput[vportOffset] = USART2->RDR;	// Read, acknowledge ISR
+		
+	}	// End if
+	
+	junk = USART2->RDR;												// Acknowledge the interrupt request if called invalidly
+	
+}	// End USART2_IRQHandler()
+

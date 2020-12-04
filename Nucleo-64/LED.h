@@ -15,13 +15,16 @@
 
 // Pins
 #define 	LED_PIN		5UL
+#define 	LED_PORT	GPIOA
 
+#define		LED_OFF		0x0UL
+#define		LED_ON		0x1UL
 
 // Function Prototypes
 void LED_Init(void);
 
-void Red_LED_Off(void);
-void Red_LED_On(void);
-void Red_LED_Toggle(void);
+void LED_Off(void);
+void LED_On(void);
+void LED_Toggle(void);
 
 #endif /* __STM32L476G_DISCOVERY_LED_H */

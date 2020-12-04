@@ -12,20 +12,15 @@
 #define		__USART_H
 
 // Header files
-#include	"stm32f303xe.h"
+#include "GPIO.h"
 
 
 // Constants
 #define 	MAX_SER_BUF_SIZE		40
 #define 	BAUD_RATE 				9600
 
-// Macros
-#define		EnableInterrupts 		__asm("ISB ; CPSIE I")
-#define		DisableInterrupts		__asm("CPSID I")
-
 
 // Function prototypes
 void usartInit(USART_TypeDef * USARTx);
-void USART2_IRQHandler(void);
 
 #endif

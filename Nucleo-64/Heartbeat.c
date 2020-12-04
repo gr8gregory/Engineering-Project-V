@@ -20,27 +20,15 @@ volatile uint8_t pingFlag = 0;
 volatile uint8_t ledFlag = 0;
 
 
-// Function to enable timer clock
-	// Update to be more generic? Macro?
-void TIMER_clock_enable(void) {
-	
-	// Set timer 1 clock
-	RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
-	
-} // End TIMER_CLOCK_ENABLE
-
-
 // Initalize the Timer on PA0 (Timer 2) and set it to trigger an interrupt
 	// For now, this is the way to act on interrupts indicated by global vars
 void Heartbeat_Init(void) {
 	
 	// NON-GENERIC------------------------------------------------
-	TIMER_clock_enable();
-	// ---------------------------------------------------------
+	RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 	
 	// Disable Timer
 	TIMx_ENABLE(HRT_TIM, TIMER_OFF);
-	// CLR_BITS(TIM2->CR1, TIM_CR1_CEN);
 	
 	// Clock Prescale (16 bits - up to 65 535)
 	HRT_TIM->PSC = 71;					// 72MHz clock --> clock/(PSC+1) = 1MHz, matches useconds
@@ -50,7 +38,6 @@ void Heartbeat_Init(void) {
 	
 	// Count direction
 	TIMx_COUNT_DIR(HRT_TIM, TIM_CNT_UP);
-	// COUNT_DIR(TIM2->CR1, 0UL);
 	
 	// NON-GENERIC------------------------------------------------
 	// Enable interrupts
@@ -62,16 +49,16 @@ void Heartbeat_Init(void) {
 	
 	// Enable Timer
 	TIMx_ENABLE(HRT_TIM, TIMER_ON);
-	// SET_BITS(TIM2->CR1, TIM_CR1_CEN);
 	
-} // End Heartbeat_Init
+} // End Heartbeat_Init()
 
 
 // Timer 2 IRQ (Heartbeat timer)
+// Function name assumes timer number
 void TIM2_IRQHandler(void) {
 	
 	// Check if the timer has overflowed
-	if((TIM2->SR & TIM_SR_UIF) != 0) {
+	if((HRT_TIM->SR & TIM_SR_UIF) != 0) {
 		
 		// Check for ping request
 		if (pingFlag) {
@@ -81,11 +68,11 @@ void TIM2_IRQHandler(void) {
 		
 		// Check for LED flip request
 		if(ledFlag) {
-			Red_LED_Toggle();			// Not actually red but whatever
+			LED_Toggle();			// Not actually red but whatever
 			ledFlag = 0;
 		} // End if
 		
 	} // End if
-	TIM2->SR &= ~TIM_SR_UIF; 			// Clear interrupt request to clear
+	HRT_TIM->SR &= ~TIM_SR_UIF; 			// Clear interrupt request to clear
 	
-} // End TIM2_IRQHandler
+} // End TIM2_IRQHandler()

@@ -47,7 +47,7 @@ int main(void) {
 	virtualPortInit();				// Set up the terminal (Currently on an ISR)
 	
 	limit_Init();							// Set up limit switches
-	// stepper_Init();						// Set up stepper motor
+	stepper_Init();						// Set up stepper motor
 	
 	servo_Init();
 	
