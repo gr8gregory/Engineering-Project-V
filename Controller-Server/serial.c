@@ -190,9 +190,9 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
   // ***Block Time Settings**
 
-  tty.c_cc[VTIME] = 10;    //VTIME determines the block time for read()
+  tty.c_cc[VTIME] = 0;    //VTIME determines the block time for read()
 
-  tty.c_cc[VMIN] = 0;      //VMIN determines the min number of characters rcv'd before unblocking read()
+  tty.c_cc[VMIN] = 1;      //VMIN determines the min number of characters rcv'd before unblocking read()
 
   
 
@@ -278,6 +278,10 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
   // Write to serial port
 
+  //TODO Test the serial input to see if it matches what is sent.
+
+  printf("%s", buf);
+
 
 
   write(serial_port, buf, strlen(buf));
@@ -286,7 +290,7 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
   // Allocate memory for read buffer, set size according to your needs
 
-  char read_buf [256];
+  char* read_buf = (char*)calloc(0,50 * sizeof(char));
 
 
 
@@ -296,7 +300,7 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
   // call printf() easily.
 
-  memset(&read_buf, '\0', sizeof(read_buf));
+  memset(read_buf, '\0', 20);
 
 
 
@@ -306,7 +310,7 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
   // settings above, specifically VMIN and VTIME
 
-  int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
+  int num_bytes = read(serial_port, read_buf, 20);
 
 
 
@@ -326,7 +330,9 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
   // print it to the screen like this!)
 
-  printf("Read %i bytes. Received message: %s", num_bytes, read_buf);
+  printf("Read %i bytes. Received message: %s\n", num_bytes, read_buf);
+
+  
 
 
 
