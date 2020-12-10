@@ -1,0 +1,16 @@
+.\objects\limit.o: limit.c
+.\objects\limit.o: limit.h
+.\objects\limit.o: timer.h
+.\objects\limit.o: SysClock.h
+.\objects\limit.o: C:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.1.0\Drivers\CMSIS\Device\ST\STM32F3xx\Include\stm32f303xe.h
+.\objects\limit.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include\core_cm4.h
+.\objects\limit.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\limit.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_version.h
+.\objects\limit.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_compiler.h
+.\objects\limit.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_armcc.h
+.\objects\limit.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include\mpu_armv7.h
+.\objects\limit.o: C:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.1.0\Drivers\CMSIS\Device\ST\STM32F3xx\Include\system_stm32f3xx.h
+.\objects\limit.o: utils.h
+.\objects\limit.o: GPIO.h
+.\objects\limit.o: stepper.h
+.\objects\limit.o: limit.h

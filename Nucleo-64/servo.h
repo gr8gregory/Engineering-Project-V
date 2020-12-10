@@ -11,16 +11,18 @@
 #ifndef _SERVO_H
 #define _SERVO_H
 
-#include "heartbeat.h"
-#include "limit.h"
+#include "timer.h"
+#include "GPIO.h"
 
 
 // Servo Pin
-#define		SERVO_PIN			0UL
+#define		SERVO_PIN				0UL
 
 // Servo Port
 #define		SERVO_PORT			GPIOB
 #define		SERVO_CLK				RCC_AHBENR_GPIOBEN
+#define 	SERVO_TIM				TIM1
+#define		SERVO_AF6				0x6UL
 
 // PWM Constants
 #define		PULSE_MIN				600UL			// In useconds, corresponds to 0 deg
@@ -32,9 +34,9 @@
 #define 	FULL_UP_DEG			180UL
 
 // Timer function prototypes
-static void servo_clock_Init(void);
 void servo_Init(void);
-void TIM1_IRQHandler(void);
 void servoSet(uint16_t);
+uint32_t getServoPos(void);
+static void servo_clock_Init(void);
 
 #endif

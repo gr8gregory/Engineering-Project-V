@@ -71,7 +71,7 @@ int serverOutput (unsigned char* buf){
 	
 	unsigned short conversion = 0;
 	unsigned short val = 0;
-	unsigned char pkg[6];
+	unsigned char pkg[7];
 	
 	val |= (buf[1] << 8); 	// Upper Nibble
 	val |= (buf[2]);	// Lower Nibble
@@ -133,36 +133,41 @@ int serverOutput (unsigned char* buf){
 			
 			break;
 		case 0x6: // Stepper 
-			if (val == 0x8001){
+
+			
+			if (val == 0x8001 ){
 			printf("true\n");
 				pkg[0] = 'S';
 				pkg[1] = 'T';
 				pkg[2] = ' ';
 				pkg[3] = 'L';
 				pkg[4] = '\0';
+				
 			}
 
-			else{
+			else if(val == 0x7FFF){
 				pkg[0] = 'S';
 				pkg[1] = 'T';
 				pkg[2] = ' ';
 				pkg[3] = 'R';
 				pkg[4] = '\0';
+				
 			}
 			sendPKG(pkg, strlen(pkg));
 
 			break;
-		case 0x7: // Servo
+		case 0x5: // Servo
+
 			if (val == 0x8001){
-				pkg[0] = 'S';
+				pkg[0] = 'T';
 				pkg[1] = 'V';
 				pkg[2] = ' ';
 				pkg[3] = 'U';
 				pkg[4] = '\0';
 			}
 
-			else{
-				pkg[0] = 'S';
+			else if(val == 0x7FFF){
+				pkg[0] = 'T';
 				pkg[1] = 'V';
 				pkg[2] = ' ';
 				pkg[3] = 'D';
@@ -199,6 +204,8 @@ int serverOutput (unsigned char* buf){
 int sendPKG (unsigned char *buf, int len){
 	char * args[2];
 	args[1] = serialPath;
+	strcat(buf, "\r");
+	
 	sendSerial(2,args,buf);
 }
 

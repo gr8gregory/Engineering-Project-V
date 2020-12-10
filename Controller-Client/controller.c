@@ -260,8 +260,3 @@ int command (u_int16_t number, u_int16_t value, int Periferal){
 	
 	return 0;
 }
-
-
-
-
-

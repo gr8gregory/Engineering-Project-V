@@ -11,16 +11,18 @@
 #ifndef _LIMIT_H
 #define _LIMIT_H
 
+#include "timer.h"
+#include "GPIO.h"
 #include "stepper.h"
 
 
 // Limit Pins
-#define		LEFT_LIM_PIN		8UL
-#define		RIGHT_LIM_PIN		9UL
+#define		LEFT_LIM_PIN		5UL
+#define		RIGHT_LIM_PIN		6UL
 
 // Limit Port
-#define		LIMIT_PORT			GPIOA
-#define		LIMIT_CLK				RCC_AHBENR_GPIOAEN
+#define		LIMIT_PORT			GPIOC
+#define		LIMIT_CLK				RCC_AHBENR_GPIOCEN
 
 // Limits
 #define 	FULL_LEFT_DEG		0UL
@@ -29,9 +31,5 @@
 // Timer function prototypes
 void limit_Init(void);
 void EXTI9_5_IRQHandler(void);
-// static void STEP_CLOCK_Init(void);
-// void stepper_Init(void);
-// void TIM3_IRQHandler(void);
-// void stepHome(void);
 
 #endif
