@@ -156,7 +156,8 @@ int serverOutput (unsigned char* buf){
 			sendPKG(pkg, strlen(pkg));
 
 			break;
-		case 0x7: // Servo
+		case 0x5: // Servo
+
 			if (val == 0x8001){
 				pkg[0] = 'T';
 				pkg[1] = 'V';
@@ -165,7 +166,7 @@ int serverOutput (unsigned char* buf){
 				pkg[4] = '\0';
 			}
 
-			else{
+			else if(val == 0x7FFF){
 				pkg[0] = 'T';
 				pkg[1] = 'V';
 				pkg[2] = ' ';
