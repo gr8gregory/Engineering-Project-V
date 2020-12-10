@@ -125,7 +125,9 @@ int main(void)
 							EnableInterrupts;
 							servoSet(stepGoToPos_deg);
 							}
-					
+							
+							clearInput();
+
 
 				break;
 				
@@ -177,10 +179,10 @@ int main(void)
 			
 						if (rxFlag)
 							{
-							vportPrintf("\n\rInput: Invalid\n\r");
-							Delay_ms(10);						// Delay for writing
+							//vportPrintf("\n\rInput: Invalid\n\r");
+							//Delay_ms(10);						// Delay for writing
 							clearInput();
-							EnableInterrupts;
+							//EnableInterrupts;
 						}	// End if
 						else {
 							clearInput();

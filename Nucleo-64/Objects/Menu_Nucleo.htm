@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Menu_Nucleo.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Menu_Nucleo.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Wed Dec 09 22:15:45 2020
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Thu Dec 10 12:46:37 2020
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -754,9 +754,9 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[9c]"></a>_printf_truncate_unsigned</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, _printf_truncate.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_int_oct
+<BR><BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_int_hex
+<LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_int_oct
 <LI><a href="#[6c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_int_dec
-<LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_int_hex
 </UL>
 
 <P><STRONG><a name="[98]"></a>_printf_str</STRONG> (Thumb, 82 bytes, Stack size 16 bytes, _printf_str.o(.text))
@@ -860,8 +860,8 @@ Global Symbols
 <P><STRONG><a name="[72]"></a>_printf_int_hex</STRONG> (Thumb, 28 bytes, Stack size 16 bytes, _printf_hex_int_ll_ptr.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = _printf_int_hex &rArr; _printf_longlong_hex &rArr; _printf_int_common &rArr; _printf_post_padding
 </UL>
-<BR>[Calls]<UL><LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_truncate_unsigned
-<LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_longlong_hex
+<BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_longlong_hex
+<LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_truncate_unsigned
 </UL>
 <BR>[Called By]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_x
 </UL>
@@ -905,10 +905,10 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_post_padding
 <LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_pre_padding
 </UL>
-<BR>[Called By]<UL><LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_longlong_oct
+<BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_longlong_hex
+<LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_longlong_oct
 <LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_longlong_dec
 <LI><a href="#[6c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_int_dec
-<LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_longlong_hex
 </UL>
 
 <P><STRONG><a name="[fa]"></a>__lib_sel_fp_printf</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, _printf_fp_dec.o(.text), UNUSED)
@@ -1125,9 +1125,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_btod_emul
 </UL>
 
-<P><STRONG><a name="[cb]"></a>Delay_ms</STRONG> (Thumb, 74 bytes, Stack size 0 bytes, gpio.o(i.Delay_ms))
+<P><STRONG><a name="[ce]"></a>Delay_ms</STRONG> (Thumb, 74 bytes, Stack size 0 bytes, gpio.o(i.Delay_ms))
 <BR><BR>[Called By]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vportMenuPrint
-<LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[24]"></a>EXTI9_5_IRQHandler</STRONG> (Thumb, 82 bytes, Stack size 8 bytes, limit.o(i.EXTI9_5_IRQHandler))
@@ -1217,7 +1216,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[8f]"></a>main</STRONG> (Thumb, 362 bytes, Stack size 0 bytes, main.o(i.main))
+<P><STRONG><a name="[8f]"></a>main</STRONG> (Thumb, 348 bytes, Stack size 0 bytes, main.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 200 + Unknown Stack Size
 <LI>Call Chain = main &rArr; vportMenuPrint &rArr; vportPrintf &rArr; vsnprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -1235,7 +1234,6 @@ Global Symbols
 <LI><a href="#[c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemCoreClockUpdate
 <LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Heartbeat_Init
 <LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_Init
-<LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Delay_ms
 </UL>
 <BR>[Called By]<UL><LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
@@ -1248,7 +1246,7 @@ Global Symbols
 <P><STRONG><a name="[c3]"></a>servo_Init</STRONG> (Thumb, 82 bytes, Stack size 8 bytes, servo.o(i.servo_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = servo_Init &rArr; GPIO_clock_enable
 </UL>
-<BR>[Calls]<UL><LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;servo_clock_Init
+<BR>[Calls]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;servo_clock_Init
 <LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;servoSet
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_clock_enable
 </UL>
@@ -1262,13 +1260,13 @@ Global Symbols
 <P><STRONG><a name="[c2]"></a>stepper_Init</STRONG> (Thumb, 200 bytes, Stack size 8 bytes, stepper.o(i.stepper_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = stepper_Init &rArr; GPIO_clock_enable
 </UL>
-<BR>[Calls]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;step_clock_Init
+<BR>[Calls]<UL><LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;step_clock_Init
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_clock_enable
 </UL>
 <BR>[Called By]<UL><LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[ce]"></a>usartInit</STRONG> (Thumb, 178 bytes, Stack size 12 bytes, usart.o(i.usartInit))
+<P><STRONG><a name="[cd]"></a>usartInit</STRONG> (Thumb, 178 bytes, Stack size 12 bytes, usart.o(i.usartInit))
 <BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = usartInit
 </UL>
 <BR>[Called By]<UL><LI><a href="#[c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;virtualPortInit
@@ -1277,7 +1275,7 @@ Global Symbols
 <P><STRONG><a name="[c1]"></a>virtualPortInit</STRONG> (Thumb, 174 bytes, Stack size 8 bytes, virtualport.o(i.virtualPortInit))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = virtualPortInit &rArr; usartInit
 </UL>
-<BR>[Calls]<UL><LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usartInit
+<BR>[Calls]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usartInit
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_clock_enable
 </UL>
 <BR>[Called By]<UL><LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1288,7 +1286,7 @@ Global Symbols
 <LI>Call Chain = vportMenuPrint &rArr; vportPrintf &rArr; vsnprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vportPrintf
-<LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Delay_ms
+<LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Delay_ms
 </UL>
 <BR>[Called By]<UL><LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -1363,11 +1361,11 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vportPrintf
 </UL>
 
-<P><STRONG><a name="[cd]"></a>step_clock_Init</STRONG> (Thumb, 118 bytes, Stack size 0 bytes, stepper.o(i.step_clock_Init))
+<P><STRONG><a name="[cc]"></a>step_clock_Init</STRONG> (Thumb, 118 bytes, Stack size 0 bytes, stepper.o(i.step_clock_Init))
 <BR><BR>[Called By]<UL><LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stepper_Init
 </UL>
 
-<P><STRONG><a name="[cc]"></a>servo_clock_Init</STRONG> (Thumb, 138 bytes, Stack size 0 bytes, servo.o(i.servo_clock_Init))
+<P><STRONG><a name="[cb]"></a>servo_clock_Init</STRONG> (Thumb, 138 bytes, Stack size 0 bytes, servo.o(i.servo_clock_Init))
 <BR><BR>[Called By]<UL><LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;servo_Init
 </UL>
 
