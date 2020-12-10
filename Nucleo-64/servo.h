@@ -36,6 +36,7 @@
 // Timer function prototypes
 void servo_Init(void);
 void servoSet(uint16_t);
+uint32_t getServoPos(void);
 static void servo_clock_Init(void);
 
 #endif

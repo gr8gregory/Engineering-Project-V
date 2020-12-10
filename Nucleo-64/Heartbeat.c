@@ -62,7 +62,7 @@ void TIM2_IRQHandler(void) {
 		
 		// Check for ping request
 		if (pingFlag) {
-			vportPrintf("\n\rp\n");
+			vportPrintf("PING!\n");
 			pingFlag = 0;				// Clear
 		} // End if
 		

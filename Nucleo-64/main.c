@@ -22,6 +22,14 @@
 #include "limit.h"
 #include "servo.h"
 
+
+#define SERIAL_OPTION (vportInput[1])	
+#define COMMAND_ENTERED vportInput[vportOffset] == '\r'
+#define SERVO_CMD ('T')
+#define STEPPER_CMD ('S')
+#define PING_CMD ('P')
+#define FLIP_CMD ('F')
+
 // Global variables
 extern volatile uint8_t rxFlag;													// Indicates serial input (command input)
 extern volatile uint8_t vportInput[MAX_SER_BUF_SIZE];		// Buffer containing command
@@ -35,188 +43,155 @@ extern uint32_t stepCount_step;
 // Function Prototypes (should probably be in some kind of header file)
 uint8_t prompt(void);
 void clearInput(void);
+void betterMain(void);
+
+//A protype of main that does not suck
 
 
-// Mainline function
-int main(void) {
-	
+int main(void)
+{
 	// Initialization
 	System_Clock_Init();			// Set up clock
 	SystemCoreClockUpdate();	// Set up clock
-	
 	virtualPortInit();				// Set up the terminal (Currently on an ISR)
-	
 	limit_Init();							// Set up limit switches
 	stepper_Init();						// Set up stepper motor
-	
 	servo_Init();
-	
 	Heartbeat_Init();					// Set up the heartbeat timer (Currently reads any input-related ISRs)
+	
 	DisableInterrupts; 				// Don't want to catch anything from the heartbeat yet
-	
-	// Todo
-		// Need to initialize and home the servo motor
-	
-	// Todo Later:
-		// Initialize the encoders
-		// Initialize the DC motors
-
 	LED_Init();									// Set up LED flashing (if we need it)
 	
-	// Start feeding terminal	
-	VP_RESET;
-	VP_CLEAR;
-	vportPrintf("MCB Controller Menu\n\r");
-	vportPrintf("\tSeptember 2020, Ver. 3.0\n\n\r");
-	vportPrintf("Command instructions\n\r");
-	vportPrintf("Flip LED: f,F\n\r");
-	vportPrintf("Ping Board: P (should return \"p\")\n\r");
-	vportPrintf("Move stepper motor: S #### (leading 0s)\n\r");
-	vportPrintf("Move stepper motor: T #### (leading 0s)\n\r");
-	vportPrintf("Press return to terminate ALL commands\r\n\n");
-	// Add other commands as needed
-	Delay_ms(20);									// Delay to write
-	
+	vportMenuPrint();							//printf the menu to the serial console
 	EnableInterrupts;							// Start catching heartbeat input now
 	
-	// Process loop
-	while(1) 
-		prompt();										// Read any command input
-	
-}
 
-
-// Function to parse input
-uint8_t prompt(void) {
 	
-	// Variable to catch bad input
-	uint8_t error = 1;
-	uint32_t stepGoToPos_deg = 0;
-	uint16_t pow_ten[4] = {1000, 100, 10, 1};
+	int VERBOSE_MODE = 1;
 	
-	// Catch commands once they are complete (once return is typed)
-	if (vportInput[vportOffset] == '\r') {	
+	//main loop
+	while(1)
+	{
+		EnableInterrupts;
+		uint32_t stepGoToPos_deg = 0;//Each loop reset to zero
 		
-		while (error) {
+		if(COMMAND_ENTERED)
+		{
+		
+			//Only execute after enter has been entered 
+			//Think about implmenting a stop of the flow of data
+			DisableInterrupts; //To avoid any interference when reading our serial data
 			
-			DisableInterrupts;							// Turn off so nothing is added while reading input
+			switch(SERIAL_OPTION)
+			{
 				
-				// Check command type (first char of input)
-				switch (vportInput[1]) { 			// The ISR steps vportOffset before writing so the 
-																				// first valid input is the second char in vportInput
-					
-					// Check for LED command (Flip LD2)
-					case ('f'):
-					case ('F'):
+				case FLIP_CMD:
 						clearInput();
 						EnableInterrupts;					// Turn on after reading/writing
 						ledFlag = 1;
-						error = 0;
+				
 						break;
 					
-					// To ping the Nucleo (capital P, should return lowercase)
-					case ('P'):
+				case PING_CMD:
 						clearInput();
 						EnableInterrupts;
 						pingFlag = 1;
-						error = 0;
-						break;
+				
+					break;
+
+				case SERVO_CMD:
 					
-					// Expects and ASSUMES input in the form " S ####"
-					case('T'):
-						clearInput();
-						EnableInterrupts;
-					
-						for(int i = 3; i < 7; i++) { 
-							
-							if ((vportInput[i] - ASCII_0) < 10) {						// Guaranteed to be gt 0 since unsigned uints wrap around
-								stepGoToPos_deg += (vportInput[i] - ASCII_0) * pow_ten[i-3];
-								error = 0;
+							if ((vportInput[4] == 'U') || (vportInput[4] == 'D')) {						// Guaranteed to be gt 0 since unsigned uints wrap around
+								
+
+							 if(vportInput[4] == 'U')
+								{
+								stepGoToPos_deg = getServoPos() + 9UL;
+								}
+								else
+								{
+								stepGoToPos_deg = getServoPos() - 9UL;
+								}
 							} // End if
-							
-							else {
-								vportPrintf("\n\rInput isn't a number.\n\r");
-								error = 1;
-							} // End else
-						} // End for
 						
-						vportPrintf("\n\rt %d\n\r", stepGoToPos_deg);
+							vportPrintf("SERVO: %d\n", stepGoToPos_deg);
 						
-						if ((stepGoToPos_deg > FULL_UP_DEG)) {
+							if ((stepGoToPos_deg > FULL_UP_DEG)) {
 							vportPrintf("\n\rInput out of range! Servo isn't moving.\n\r");
-							error = 1;
-						} // End if
-						
-						else {
-							servoSet(stepGoToPos_deg);
-							// stepGoToPos_step = (stepCount_step * stepGoToPos_deg)/FULL_RIGHT_DEG;
-							error = 0;
-						}
-						break;
-						
-					// Expects and ASSUMES input in the form S ####
-					case('S'):
-						clearInput();
-						EnableInterrupts;
-						
-						for(int i = 3; i < 7; i++) { 
-							
-							if ((vportInput[i] - ASCII_0) < 10) {						// Guaranteed to be gt 0 since unsigned uints wrap around
-								stepGoToPos_deg += (vportInput[i] - ASCII_0) * pow_ten[i-3];
-								error = 0;
 							} // End if
-							
-							else {
-								vportPrintf("\n\rInput isn't a number.\n\r");
-								error = 1;
+						
+							else
+							{
+							EnableInterrupts;
+							servoSet(stepGoToPos_deg);
+							}
+					
+
+				break;
+				
+				case STEPPER_CMD:
+						clearInput();
+						
+						//Check for a vaild input
+						if ((vportInput[4] == 'L') || (vportInput[4] == 'R')) 
+							{						
+								
+									//Move stepper either left or right depending on the value
+									if(vportInput[4] == 'L')
+									{
+										DisableInterrupts;
+									stepGoToPos_deg = getStep() + 9; //Move by a set position
+									}
+									else
+									{
+										DisableInterrupts;
+									stepGoToPos_deg = getStep() - 9; //9UL; //Move by a set position
+									}
+							} // End if
+							else 
+							{
+								if(VERBOSE_MODE)
+								{
+								vportPrintf("\rInput isn't a number.\n");
+								}
 							} // End else
-						} // End for
 						
-						vportPrintf("\n\rs %d\n\r", stepGoToPos_deg);
-						
-						if (stepGoToPos_deg > FULL_RIGHT_DEG) {
-							vportPrintf("\n\rInput too big! Stepper isn't moving.\n\r");
-							error = 1;
+							
+						vportPrintf("Stepper %u\n", stepGoToPos_deg);
+							
+						//Check stepper position to determin if it can be moved
+						if ((stepGoToPos_deg < 0) || (stepGoToPos_deg > FULL_RIGHT_DEG)) 
+						{
+							vportPrintf("\rInput too big! Stepper isn't moving\n");
+							
 						} // End if
 						
-						else {
+						else 
+						{
+							EnableInterrupts; //Interrupts must be enabled to allow stepper to be moved
 							stepGoToPos_step = (stepCount_step * stepGoToPos_deg)/FULL_RIGHT_DEG;
-							error = 0;
 						}
-						break;
-					
-					default:	
-						if (rxFlag) {
+				break;
+						
+				default:
+			
+						if (rxFlag)
+							{
 							vportPrintf("\n\rInput: Invalid\n\r");
-							Delay_ms(20);						// Delay for writing
+							Delay_ms(10);						// Delay for writing
 							clearInput();
 							EnableInterrupts;
-							error = 1;							// Report invalid input
 						}	// End if
 						else {
-							error = 1;
 							clearInput();
 						} // End else
 						DisableInterrupts;				// Turn on to check for new, valid input	
-					
-				} // End switch
-				
-			EnableInterrupts;
-		} // End while
-	}	// End if
-	
-	return(0);
-} // End prompt
+				}//end of switch
+			
+		}//end of if
+	}//End of main loop
+}//end of main
 
 
-// Private function to clear anything related to terminal input
-	// Simply to declutter prompt()
-static void clearInput(void) {
-	
-	rxFlag = 0;										// Reset after reading
-	vportInput[vportOffset] = 0;	// Delete return char
-	vportOffset = 0;							// Reset the command input	
-	vportInput[1] = 0;						// Wipe scanned char to avoid infinite loop
-	
-} // End clearInput
+
 

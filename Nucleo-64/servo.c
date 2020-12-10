@@ -27,6 +27,11 @@ volatile uint32_t servoCurPos_sec = 0;				// Same range as servoCurPos
 
 
 // Home stepper motor on initialization
+
+uint32_t getServoPos(void)
+{
+	return servoCurPos_deg;
+}
 void servo_Init(void) {
 	
 	// Set up GPIO pins

@@ -17,6 +17,25 @@ volatile uint8_t vportInput[MAX_SER_BUF_SIZE];	// Stores virtual port input
 volatile uint32_t vportOffset = 0;							// Stores virtual port input offset
 volatile uint8_t rxFlag = 0;										// Indicates if there is input
 
+//A simple function that prints the menu to serial
+void vportMenuPrint(void)
+{
+	VP_RESET;
+	VP_CLEAR;
+	vportPrintf("MCB Controller Menu\n\r");
+	vportPrintf("\tSeptember 2020, Ver. 3.0\n\n\r");
+	vportPrintf("Command instructions\n\r");
+	vportPrintf("Flip LED: f,F\n\r");
+	vportPrintf("Ping Board: P (should return \"p\")\n\r");
+	vportPrintf("Move stepper motor: S #### (leading 0s)\n\r");
+	vportPrintf("Move stepper motor: T #### (leading 0s)\n\r");
+	vportPrintf("Press return to terminate ALL commands\r\n\n");
+		vportPrintf("\n");
+
+	
+	// Add other commands as needed
+	Delay_ms(20);									// Delay to write
+}
 
 // Function to initialize a virtual port for control and debugging
 	// For STM32F303RET6 (Nucleo64), PA2 is Tx and PA3 is Rx (USART2)
@@ -114,4 +133,14 @@ void USART2_IRQHandler(void) {
 	junk = USART2->RDR;												// Acknowledge the interrupt request if called invalidly
 	
 }	// End USART2_IRQHandler()
+
+void clearInput(void) 
+{
+	
+	rxFlag = 0;										// Reset after reading
+	vportInput[vportOffset] = 0;	// Delete return char
+	vportOffset = 0;							// Reset the command input	
+	vportInput[1] = 0;						// Wipe scanned char to avoid infinite loop
+	
+} // End clearInput
 
