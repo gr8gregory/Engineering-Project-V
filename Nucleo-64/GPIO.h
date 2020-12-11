@@ -44,7 +44,9 @@
 #define		GPIOx_OP_TYPE(port, pin, mode)				FORCE_BITS((port->OTYPER), 1UL << (pin), (mode) << (pin))
 #define		GPIOx_PIN_SPEED(port, pin, speed)			FORCE_BITS((port->OSPEEDR), 3UL << (2UL*(pin)), (speed) << (2UL*(pin)))
 #define		GPIOx_PIN_PULL(port, pin, pull)				FORCE_BITS((port->PUPDR), 3UL << (2UL*(pin)), (pull) << (2UL*(pin)))
-#define 	GPIOx_AF_MODE(port, pin, mode)				FORCE_BITS((port->AFR[0]), 0xFUL << ((pin)*4UL), (mode) << ((pin)*4UL))
+#define 	GPIOx_AFL_MODE(port, pin, mode)				FORCE_BITS((port->AFR[0]), 0xFUL << ((pin)*4UL), (mode) << ((pin)*4UL))
+#define 	GPIOx_AFH_MODE(port, pin, mode)				FORCE_BITS((port->AFR[1]), 0xFUL << ((pin-8UL)*4UL), (mode) << ((pin-8UL)*4UL))
+					// Subtract 8UL in GPIOx_AFH_MODR since the high part of the register does pins 8 through 15
 
 // Interrupt Macros
 #define		EnableInterrupts 		__asm("ISB ; CPSIE I")
