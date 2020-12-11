@@ -50,8 +50,8 @@ main (int argc, char *argv[])
 	FILE *p;
 
 
-	if (argc != 2) {
-		printf ("usage: c PORT_NUMBER\n");
+	if (argc != 1) {
+		printf ("usage: c \n");
 		return 1;
 	}	/* endif */
 
@@ -77,7 +77,7 @@ main (int argc, char *argv[])
 	memset (&server_addr, 0, sizeof (server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = htonl (INADDR_ANY);
-	server_addr.sin_port = htons (atoi(argv[1]));
+	server_addr.sin_port = htons (PORT);
 
 	if (bind (server_socket, (struct sockaddr *)&server_addr, 
 	sizeof (server_addr)) < 0) {

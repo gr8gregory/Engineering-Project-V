@@ -4,7 +4,8 @@
 
 /* Just run the controller() Function */
 int main (int argc, char *argv[]){
-
+	
+	//execl("server-ip","server-ip", NULL);
 	controller();
 
 }

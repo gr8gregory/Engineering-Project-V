@@ -138,6 +138,9 @@ int controller (void){
  * Take teh read value, assign its corresponding hex value and send the information off to be sent to the lab computer
  */
 
+
+
+// Update: Add Homeing for Servo And stepper, and 360 to right trigger, and potentially serial break
 int command (u_int16_t number, u_int16_t value, int Periferal){
 	
 	

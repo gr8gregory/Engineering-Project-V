@@ -174,26 +174,73 @@ int serverOutput (unsigned char* buf){
 				pkg[4] = '\0';
 			}
 			sendPKG(pkg, strlen(pkg));
-
+	
+		case 0x8: // Flip LED
+			
+			if(val == 1){
+				pkg[0] = 'F';
+				pkg[1] = '\0';
+				
+				sendPKG(pkg, strlen(pkg));
+				//printf("\n***%s***\n", pkg);
+			}
 			break;
+			
+		case 0x9: // Home Stepper
+			
+			if(val == 1){
+				pkg[0] = 'S';
+				pkg[1] = 'H';
+				pkg[2] = '\0';
+				
+				sendPKG(pkg, strlen(pkg));
+			}	
+			break;
+			
+		case 0xa: // Home Servo
+			
+			if(val == 1){
+				pkg[0] = 'V';
+				pkg[1] = 'H';
+				pkg[2] = '\0';
+				
+				sendPKG(pkg, strlen(pkg));
+			}
+			
+			break;
+		
 		case 0xe: // ping
 			
-			pkg[0] = 'P';
-			pkg[1] = '\0';
+			if(val == 1){
+				pkg[0] = 'P';
+				pkg[1] = '\0';
+				
+				sendPKG(pkg, strlen(pkg));
+			}
+			break;
 			
-			sendPKG(pkg, strlen(pkg));
-			//printf("\n***%s***\n", pkg);
+		case 0xf: // DO 360
+			
+			if(val == 1){
+				pkg[0] = 'Z';
+				pkg[1] = '0';
+				pkg[2] = '\0';
+				
+				sendPKG(pkg, strlen(pkg));
+			}
+			
+		// When button is released, it will read 'Z1' which should terminate the rotation
+			if(val == 0){
+				pkg[0] = 'Z';
+				pkg[1] = '1';
+				pkg[2] = '\0';
+				
+				sendPKG(pkg, strlen(pkg));
+			}
 			
 			break;
-		case 0xf: // LED
 			
-			pkg[0] = 'F';
-			pkg[1] = '\0';
-			
-			sendPKG(pkg, strlen(pkg));
-			//printf("\n***%s***\n", pkg);
-			
-			break;
+		
 			
 		default:
 			return 0;
@@ -208,4 +255,10 @@ int sendPKG (unsigned char *buf, int len){
 	
 	sendSerial(2,args,buf);
 }
+
+
+// Function to send the ping comand to the client.
+/*int sendCMD (unsigned char *buf, int len){
+	sendCMD(suff);
+}*/
 
