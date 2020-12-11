@@ -25,9 +25,9 @@
 #define		DC_DRV_R_PIN		11UL
 
 #define		DC_DIR_FL_PIN		8UL
-#define		DC_DIR_FR_PIN		9UL
+#define		DC_DIR_BL_PIN		9UL
 
-#define		DC_DIR_BL_PIN		8UL
+#define		DC_DIR_FR_PIN		8UL
 #define		DC_DIR_BR_PIN		9UL
 
 // DC Port Info
@@ -47,5 +47,6 @@
 void DC_DRV_Init(void);
 void DC_DRV_clock_Init(void);
 void dcMotorSet(uint16_t left, uint16_t right);
+void DC_DIR_Init(void);
 
 #endif

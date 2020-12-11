@@ -21,6 +21,7 @@
 #include "stepper.h"
 #include "limit.h"
 #include "servo.h"
+#include "dcmotor.h"
 
 
 #define SERIAL_OPTION (vportInput[1])	
@@ -57,6 +58,8 @@ int main(void)
 	limit_Init();							// Set up limit switches
 	stepper_Init();						// Set up stepper motor
 	servo_Init();
+	DC_DRV_Init();
+	DC_DIR_Init();
 	Heartbeat_Init();					// Set up the heartbeat timer (Currently reads any input-related ISRs)
 	
 	DisableInterrupts; 				// Don't want to catch anything from the heartbeat yet
@@ -125,9 +128,7 @@ int main(void)
 							EnableInterrupts;
 							servoSet(stepGoToPos_deg);
 							}
-							
-							clearInput();
-
+					
 
 				break;
 				
@@ -179,10 +180,10 @@ int main(void)
 			
 						if (rxFlag)
 							{
-							//vportPrintf("\n\rInput: Invalid\n\r");
-							//Delay_ms(10);						// Delay for writing
+							vportPrintf("\n\rInput: Invalid\n\r");
+							Delay_ms(10);						// Delay for writing
 							clearInput();
-							//EnableInterrupts;
+							EnableInterrupts;
 						}	// End if
 						else {
 							clearInput();

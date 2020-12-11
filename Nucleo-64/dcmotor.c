@@ -40,7 +40,7 @@ void DC_DRV_Init(void) {
 		// the CCRx register and it does the rest
 	
 	// Choose a random speed for now 
-	dcMotorSet(300,300);
+	dcMotorSet(1,1);
 	
 } // End DC_DRV_Init()
 
@@ -67,6 +67,12 @@ void DC_DIR_Init(void) {
 	GPIOx_PIN_PULL(	DC_DIR_L_PORT, DC_DIR_BL_PIN, PULL_UP);
 	GPIOx_PIN_PULL(	DC_DIR_R_PORT, DC_DIR_FR_PIN, PULL_UP);
 	GPIOx_PIN_PULL(	DC_DIR_R_PORT, DC_DIR_BR_PIN, PULL_UP);
+	
+	// Set forward for testing (TEMPORARY, OTHERWISE THE ROBOT WILL TAKE OFF)
+	CLR_BITS(DC_DIR_L_PORT->ODR, DC_DIR_FL_PIN);
+	SET_BITS(DC_DIR_L_PORT->ODR, DC_DIR_BL_PIN);
+	CLR_BITS(DC_DIR_R_PORT->ODR, DC_DIR_FR_PIN);
+	SET_BITS(DC_DIR_R_PORT->ODR, DC_DIR_BR_PIN);
 	
 	// Set up Interrupts (roll into the speed interrupt?)
 	
