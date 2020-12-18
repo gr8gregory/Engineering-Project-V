@@ -15,19 +15,24 @@
 #include "GPIO.h"
 
 
-// Motor Selection
-#define		DC_LEFT					0xUL
-#define		DC_RIGHT				1xUL
-#define		DC_BOTH					2xUL
+// Inividual Motor settings
+#define 	OFF							0x0UL
+#define 	FWD							0x1UL
+#define		BWD							0x2UL
+#define		LOCK						0x3UL
+
+#define		TOP_SPEED				3000UL
+#define 	SAME_SPEED			TOP_SPEED + 1
+
 
 // DC Pins
 #define		DC_DRV_L_PIN		10UL
 #define		DC_DRV_R_PIN		11UL
 
 #define		DC_DIR_FL_PIN		8UL
-#define		DC_DIR_FR_PIN		9UL
+#define		DC_DIR_BL_PIN		9UL
 
-#define		DC_DIR_BL_PIN		8UL
+#define		DC_DIR_FR_PIN		8UL
 #define		DC_DIR_BR_PIN		9UL
 
 // DC Port Info
@@ -47,5 +52,6 @@
 void DC_DRV_Init(void);
 void DC_DRV_clock_Init(void);
 void dcMotorSet(uint16_t left, uint16_t right);
+void DC_DIR_Init(void);
 
 #endif

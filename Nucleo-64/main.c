@@ -21,6 +21,7 @@
 #include "stepper.h"
 #include "limit.h"
 #include "servo.h"
+#include "dcmotor.h"
 
 
 #define SERIAL_OPTION (vportInput[1])	
@@ -29,6 +30,7 @@
 #define STEPPER_CMD ('S')
 #define PING_CMD ('P')
 #define FLIP_CMD ('F')
+#define DC_CMD ('D')
 
 // Global variables
 extern volatile uint8_t rxFlag;													// Indicates serial input (command input)
@@ -38,6 +40,8 @@ extern volatile uint8_t pingFlag;												// Indicates ping request
 extern volatile uint8_t ledFlag;												// Indicates change LED state
 extern volatile uint32_t stepGoToPos_step;							// Inidicates the position to send the stepper to
 extern uint32_t stepCount_step;
+extern volatile uint8_t dirL;
+extern volatile uint8_t dirR;
 
 
 // Function Prototypes (should probably be in some kind of header file)
@@ -57,6 +61,8 @@ int main(void)
 	limit_Init();							// Set up limit switches
 	stepper_Init();						// Set up stepper motor
 	servo_Init();
+	DC_DIR_Init();						// Set up DC motor directions (do before drive)
+	DC_DRV_Init();						// Set up DC motor drive/speed
 	Heartbeat_Init();					// Set up the heartbeat timer (Currently reads any input-related ISRs)
 	
 	DisableInterrupts; 				// Don't want to catch anything from the heartbeat yet
@@ -68,6 +74,9 @@ int main(void)
 
 	
 	int VERBOSE_MODE = 1;
+	uint8_t negative = 0;
+	uint16_t speed = 0;			// Max value TOP_SPEED
+	uint16_t power10[4] = {1000, 100, 10, 1};
 	
 	//main loop
 	while(1)
@@ -125,9 +134,7 @@ int main(void)
 							EnableInterrupts;
 							servoSet(stepGoToPos_deg);
 							}
-							
-							clearInput();
-
+					
 
 				break;
 				
@@ -175,14 +182,89 @@ int main(void)
 						}
 				break;
 						
+				case DC_CMD:
+					clearInput();
+					
+					if (vportInput[4] == '-')
+						negative = 1;
+					
+					for(int i=0, j=4; i<3; i++, j++)
+						speed += vportInput[j + negative] * power10[i];
+					
+					if(speed > TOP_SPEED) {
+						if (VERBOSE_MODE)
+							vportPrintf("\rInvalid speed.\n");
+					} // End if
+					else {
+				
+						if ((vportInput[2] == 'L') || (vportInput[2] == 'R') || (vportInput[2] == 'B')) {
+							
+							if(vportInput[2] == 'L') {
+								DisableInterrupts;
+								
+								if (negative)
+									dirL = BWD;
+								else
+									dirL = FWD;
+								
+								if (0 == speed)
+									dirL = LOCK;
+								
+								dcMotorSet(speed, SAME_SPEED);
+							} // End if
+							
+							else if(vportInput[2] == 'R') {
+								DisableInterrupts;
+								
+								if (negative)
+									dirR = BWD;
+								else
+									dirR = FWD;
+								
+								if (0 == speed)
+									dirR = LOCK;
+								
+								dcMotorSet(SAME_SPEED, speed);
+							} // End if
+							
+							else {								// If both motors
+								DisableInterrupts;
+								
+								if (negative) {
+									dirL = BWD;
+									dirR = BWD;
+								} // End if
+								else {
+									dirL = FWD;
+									dirR = FWD;
+								} // End else
+								
+								if (0 == speed) {
+									dirL = LOCK;
+									dirR = LOCK;
+								} // End if
+								
+								dcMotorSet(speed, speed);
+							} // End if
+						} // End if L or R or B
+							
+						else {
+							if(VERBOSE_MODE)
+								vportPrintf("\rInput isn't a number.\n");
+						} // End else
+					
+					} // End else (the one for valid speed check)
+				
+				break;
+						
 				default:
 			
 						if (rxFlag)
 							{
-							//vportPrintf("\n\rInput: Invalid\n\r");
-							//Delay_ms(10);						// Delay for writing
+							vportPrintf("\n\rInput: Invalid\n\r");
+							Delay_ms(10);						// Delay for writing
 							clearInput();
-							//EnableInterrupts;
+							EnableInterrupts;
 						}	// End if
 						else {
 							clearInput();

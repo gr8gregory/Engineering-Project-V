@@ -32,13 +32,15 @@ uint32_t getServoPos(void)
 {
 	return servoCurPos_deg;
 }
+
+
 void servo_Init(void) {
 	
 	// Set up GPIO pins
 	GPIO_clock_enable(SERVO_CLK);												// Turn on port clock
 	
 	GPIOx_PIN_MODE(SERVO_PORT, SERVO_PIN, MODER_AF);
-	GPIOx_AF_MODE(SERVO_PORT, SERVO_PIN, SERVO_AF6);
+	GPIOx_AFL_MODE(SERVO_PORT, SERVO_PIN, SERVO_AF6);
 	
 	GPIOx_PIN_SPEED(SERVO_PORT, SERVO_PIN, LOW_SPEED);
 	GPIOx_PIN_PULL(SERVO_PORT, SERVO_PIN, PULL_NONE);
@@ -72,7 +74,7 @@ void servoSet(uint16_t angle) {
 
 // Set up timer for checking motor (ISR)
 static void servo_clock_Init(void) {
-	// ----------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------
 	RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;	// TIMER_CLOCK_ENABLE();
 	
 	// Disable Timer

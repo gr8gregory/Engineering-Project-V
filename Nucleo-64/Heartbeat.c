@@ -8,7 +8,7 @@
  ****************************************************************************/
 
 /* 
- * THE HEARTBEAT TIMER IS ON TIMER 2.
+ * THE HEARTBEAT TIMER IS ON TIMER 2 (will need to move for the encoder)
  */
  
  
@@ -18,6 +18,10 @@
 // Globals
 volatile uint8_t pingFlag = 0;
 volatile uint8_t ledFlag = 0;
+extern volatile uint8_t dirL;
+extern volatile uint8_t dirR;
+static uint8_t delayL = 0;
+static uint8_t delayR = 0;
 
 
 // Initalize the Timer on PA0 (Timer 2) and set it to trigger an interrupt
@@ -71,6 +75,43 @@ void TIM2_IRQHandler(void) {
 			LED_Toggle();			// Not actually red but whatever
 			ledFlag = 0;
 		} // End if
+		
+		// -------------------ASSUMPTIONS-------------------
+		/*** Motors Directions Setting ***/				// Assume motors are not modified anywhere else
+			// static uint8_t curState;							// Don't care about first 4 bits
+			static uint8_t Lstate;									// Get bits 3 and 4 for left motor and shift down
+			static uint8_t Rstate;									// Get bits 1 and 2 for right motor
+			
+			// Check delay flags (so motors have some time to stop before switching directions)
+			if(delayL) {
+				delayL = 0;
+				FORCE_BITS(DC_DIR_L_PORT->ODR, LOCK << DC_DIR_FL_PIN,
+							dirL << DC_DIR_FL_PIN);						// F pin is the lower one (ASSUMPTION)
+				Lstate = dirL;
+			} // End if
+			
+			if(delayR) {
+				delayR = 0;
+				FORCE_BITS(DC_DIR_R_PORT->ODR, LOCK << DC_DIR_FR_PIN,
+							dirR << DC_DIR_FR_PIN);						// F pin is the lower one (ASSUMPTION)
+				Rstate = dirR;
+			} // End if
+			
+			if(dirL != Lstate) {
+				FORCE_BITS(DC_DIR_L_PORT->ODR, LOCK << DC_DIR_FL_PIN,
+							LOCK << DC_DIR_FL_PIN);						// F pin is the lower one (ASSUMPTION)		
+				delayL++;
+				Lstate = LOCK;
+			} // End if
+			
+			if(dirR != Rstate) {
+				FORCE_BITS(DC_DIR_R_PORT->ODR, LOCK << DC_DIR_FR_PIN,
+							LOCK << DC_DIR_FR_PIN);						// F pin is the lower one (ASSUMPTION)
+				delayR++;
+				Rstate = LOCK;
+			} // End if
+		// -----------------ASSUMPTIONS END-----------------
+		/*** End of Motors Direction Setting ***/
 		
 	} // End if
 	HRT_TIM->SR &= ~TIM_SR_UIF; 			// Clear interrupt request to clear

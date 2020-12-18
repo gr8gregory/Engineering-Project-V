@@ -12,6 +12,8 @@
 
 
 // Global Variables
+volatile char dirL;
+volatile char dirR;
 
 
 // Function to set up DC Motor drive (PWM) GPIOs
@@ -39,38 +41,12 @@ void DC_DRV_Init(void) {
 	// Shouldn't need any kind of interrupt -> like the servo, you just write
 		// the CCRx register and it does the rest
 	
-	// Choose a random speed for now 
-	dcMotorSet(300,300);
+	// Choose a random speed and direction for now 
+	dirL = FWD;
+	dirR = BWD;
+	dcMotorSet(10,10);
 	
 } // End DC_DRV_Init()
-
-
-// Function to set up DC Motor direction GPIOs
-void DC_DIR_Init(void) {
-	
-	// Start clock
-	GPIO_clock_enable(DC_DIR_L_CLK);
-	GPIO_clock_enable(DC_DIR_R_CLK);
-	
-	// Set up pins
-	GPIOx_PIN_MODE(	DC_DIR_L_PORT, DC_DIR_FL_PIN, MODER_OUT);
-	GPIOx_PIN_MODE(	DC_DIR_L_PORT, DC_DIR_BL_PIN, MODER_OUT);
-	GPIOx_PIN_MODE(	DC_DIR_R_PORT, DC_DIR_FR_PIN, MODER_OUT);
-	GPIOx_PIN_MODE(	DC_DIR_R_PORT, DC_DIR_BR_PIN, MODER_OUT);
-	
-	GPIOx_OP_TYPE(	DC_DIR_L_PORT, DC_DIR_FL_PIN, PUSH_PULL);
-	GPIOx_OP_TYPE(	DC_DIR_L_PORT, DC_DIR_BL_PIN, PUSH_PULL);
-	GPIOx_OP_TYPE(	DC_DIR_R_PORT, DC_DIR_FR_PIN, PUSH_PULL);
-	GPIOx_OP_TYPE(	DC_DIR_R_PORT, DC_DIR_BR_PIN, PUSH_PULL);
-	
-	GPIOx_PIN_PULL(	DC_DIR_L_PORT, DC_DIR_FL_PIN, PULL_UP);
-	GPIOx_PIN_PULL(	DC_DIR_L_PORT, DC_DIR_BL_PIN, PULL_UP);
-	GPIOx_PIN_PULL(	DC_DIR_R_PORT, DC_DIR_FR_PIN, PULL_UP);
-	GPIOx_PIN_PULL(	DC_DIR_R_PORT, DC_DIR_BR_PIN, PULL_UP);
-	
-	// Set up Interrupts (roll into the speed interrupt?)
-	
-} // End DC_DIR_Init()
 
 
 // Function to set up timer for speed updates
@@ -133,3 +109,34 @@ void dcMotorSet(uint16_t left, uint16_t right) {
 	DC_DRV_TIM->CCR2 = pulseR;
 
 } // End dcMotorSet()
+
+
+/*** Direction Functions ***/
+// Directions actually set by the heartbeat timer
+
+// Function to set up DC Motor direction GPIOs
+void DC_DIR_Init(void) {
+	
+	// Start clock
+	GPIO_clock_enable(DC_DIR_L_CLK);
+	GPIO_clock_enable(DC_DIR_R_CLK);
+	
+	// Set up pins
+	GPIOx_PIN_MODE(	DC_DIR_L_PORT, DC_DIR_FL_PIN, MODER_OUT);
+	GPIOx_PIN_MODE(	DC_DIR_L_PORT, DC_DIR_BL_PIN, MODER_OUT);
+	GPIOx_PIN_MODE(	DC_DIR_R_PORT, DC_DIR_FR_PIN, MODER_OUT);
+	GPIOx_PIN_MODE(	DC_DIR_R_PORT, DC_DIR_BR_PIN, MODER_OUT);
+	
+	GPIOx_OP_TYPE(	DC_DIR_L_PORT, DC_DIR_FL_PIN, PUSH_PULL);
+	GPIOx_OP_TYPE(	DC_DIR_L_PORT, DC_DIR_BL_PIN, PUSH_PULL);
+	GPIOx_OP_TYPE(	DC_DIR_R_PORT, DC_DIR_FR_PIN, PUSH_PULL);
+	GPIOx_OP_TYPE(	DC_DIR_R_PORT, DC_DIR_BR_PIN, PUSH_PULL);
+	
+	GPIOx_PIN_PULL(	DC_DIR_L_PORT, DC_DIR_FL_PIN, PULL_UP);
+	GPIOx_PIN_PULL(	DC_DIR_L_PORT, DC_DIR_BL_PIN, PULL_UP);
+	GPIOx_PIN_PULL(	DC_DIR_R_PORT, DC_DIR_FR_PIN, PULL_UP);
+	GPIOx_PIN_PULL(	DC_DIR_R_PORT, DC_DIR_BR_PIN, PULL_UP);
+	
+	// Set up Interrupts (roll into the speed interrupt?)
+	
+} // End DC_DIR_Init()
