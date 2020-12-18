@@ -188,12 +188,20 @@ int main(void)
 					if (vportInput[4] == '-')
 						negative = 1;
 					
-					for(int i=0, j=4; i<3; i++, j++)
-						speed += vportInput[j + negative] * power10[i];
-					
+					for(int i=4; i<=7; i++) {
+						
+						if ((vportInput[i + negative] - ASCII_0) < 10)
+							speed += ((uint16_t)(vportInput[i + negative] - ASCII_0)) * power10[i-4];
+						
+						else {
+							if (VERBOSE_MODE)
+								vportPrintf("\rInput not a number\n");
+						} // End if
+					} // End for
+						
 					if(speed > TOP_SPEED) {
 						if (VERBOSE_MODE)
-							vportPrintf("\rInvalid speed.\n");
+							vportPrintf("\rInvalid speed\n");
 					} // End if
 					else {
 				
@@ -254,7 +262,9 @@ int main(void)
 						} // End else
 					
 					} // End else (the one for valid speed check)
-				
+					negative = 0;
+					speed = 0;
+					
 				break;
 						
 				default:

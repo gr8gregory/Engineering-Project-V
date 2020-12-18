@@ -101,12 +101,15 @@ void dcMotorSet(uint16_t left, uint16_t right) {
 	
 	// PWM goes from 0 to 30000 which is 0 to 30 ms
 	// For now, speeds go from 0 to 3000 so the slope is 10
-	pulseL = (left * 10);
-	pulseR = (right * 10);
+	if (left != SAME_SPEED) {
+		pulseL = (left * 10);
+		DC_DRV_TIM->CCR1 = pulseL;
+	} // End if
 	
-	// Write port
-	DC_DRV_TIM->CCR1 = pulseL;
-	DC_DRV_TIM->CCR2 = pulseR;
+	if (right != SAME_SPEED) {
+		pulseR = (right * 10);
+		DC_DRV_TIM->CCR2 = pulseR;
+	} // End if
 
 } // End dcMotorSet()
 
