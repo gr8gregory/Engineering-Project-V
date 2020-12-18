@@ -1,10 +1,16 @@
 #include "server-ip.h"
 #include "serial.h"
 
-int sendPKG (unsigned char *buf, int len);
 
 char serialPath[] = "/dev/ttyS3";
 
+int sendPKG (unsigned char *buf, int len){
+	char * args[2];
+	args[1] = serialPath;
+	strcat(buf, "\r");
+	
+	sendSerial(2,args,buf);
+}
 
 /* Gregs Controller Button Mapout
  *
@@ -240,25 +246,20 @@ int serverOutput (unsigned char* buf){
 			
 			break;
 			
-		
-			
 		default:
 			return 0;
 		}
 	return 0;
 }
 
-int sendPKG (unsigned char *buf, int len){
-	char * args[2];
-	args[1] = serialPath;
-	strcat(buf, "\r");
-	
-	sendSerial(2,args,buf);
-}
+
 
 
 // Function to send the ping comand to the client.
-/*int sendCMD (unsigned char *buf, int len){
-	sendCMD(suff);
-}*/
+void sendPING (void){
+	
+	sendP();
+}
+
+
 

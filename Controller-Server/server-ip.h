@@ -15,3 +15,6 @@
 #define PORT 5000
 
 int serverOutput (unsigned char* buf);
+
+int sendP(void);
+

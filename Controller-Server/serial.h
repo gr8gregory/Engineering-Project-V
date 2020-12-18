@@ -3,4 +3,6 @@
 
 int sendSerial(int argc, char* argv[], char* buf);
 
+void sendPING (void);
+
 #endif 

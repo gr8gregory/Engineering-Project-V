@@ -71,7 +71,7 @@ main (int argc, char *argv[])
 	memset (&server_addr, 0, sizeof (server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = htonl (INADDR_ANY);
-	server_addr.sin_port = htons (atoi(argv[1]));
+	server_addr.sin_port = htons (5000);
 
 	
 
@@ -128,7 +128,7 @@ main (int argc, char *argv[])
 			read (client_socket, buffer, BUFSIZ);
 
 			/* print the incoming buffer */
-			//printf("Incoming Buffer: %x%x%x\n", buffer[0],buffer[1],buffer[2]);
+			printf("Incoming Buffer: %x%x%x\n\n", buffer[0],buffer[1],buffer[2]);
 			serverOutput(buffer);
 
 			close (client_socket);

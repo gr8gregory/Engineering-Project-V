@@ -22,7 +22,7 @@
 
 #define PORT 5000
 
-unsigned char buffer[4];
+unsigned char buffer[2];
 
 
 /*
@@ -36,7 +36,7 @@ unsigned char buffer[4];
 void
 SigCatcher (int n)
 {
-    wait3 (NULL, WNOHANG, NULL);    
+	wait3 (NULL, WNOHANG, NULL);    
 	signal (SIGCHLD, SigCatcher);
 }
 
@@ -133,7 +133,7 @@ main (int argc, char *argv[])
 			read (client_socket, buffer, BUFSIZ);
 
 			/* print the incoming buffer */
-			printf("Incoming Buffer: %x%x%x", buffer[0],buffer[1],buffer[2]);
+			printf("Ping: %x", buffer[0]);
 
 			/*
 			 * write data to client, close socket, and exit child app
@@ -142,9 +142,6 @@ main (int argc, char *argv[])
 			close (client_socket);
 			return 0;
 		}		
-		
-		
-		
 		
 		else {
 			/*

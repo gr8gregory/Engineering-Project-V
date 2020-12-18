@@ -1,22 +1,7 @@
-
-
-/*
- * client.c
- * This is running on TCP protocol
- *
- * This is a sample internet client application that will talk
- * to the server s.c via port of choice
- */
-
-/*
- * 
- */
- 
-/* Header Files */ 
 #include "server-ip.h"
 
 /* Global Variables */
-unsigned char buffer[4];
+unsigned char buffer[2];
 
 int status = 0;
 int client_socket, len;
@@ -26,28 +11,10 @@ struct hostent *host;
 /*
  * Recieve read data from the controller
  */
-int sendCMD(unsigned char cmd, unsigned short val){
+int sendP(void){
 	
-	
-	/* Place the button hex value into index 0 */
-	//buffer[0] = cmd;
-	
-	/* Take unsigned short value read from the controller and split it into two index's of the buffer */
-	//buffer[1] = (val >> 8) & 0xff;
-	//buffer[2] = val & 0xff;
-	
-	/* Place a null terminator in the last element */
-	//buffer[3] ='\0';
-	
-	/* Sanity Check */
-	
-	
-	// Test buffer to send. Once verified what is being sent this will change
-	buffer[0] = 'T';
-	buffer[1] = 'H';
-	buffer[2] = 'E';
-	buffer[3] = '\0';
-	printf("Printing buffer: %x%x%x \n\n", buffer[0],buffer[1],buffer[2]);
+	buffer[0] = 'P';
+	buffer[1] = '\0';
 
 
 	/*
@@ -63,7 +30,7 @@ int sendCMD(unsigned char cmd, unsigned short val){
 	 */
 		
 	memset (&server_addr, 0, sizeof (server_addr));
-	server_addr.sin_addr.s_addr = inet_addr("192.168.0.20"); // Change address of client
+	server_addr.sin_addr.s_addr = inet_addr("192.168.0.20"); // Change address to local Computer
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons (5000); // hard coded the lab computer port here
 
@@ -91,7 +58,7 @@ int sendCMD(unsigned char cmd, unsigned short val){
 	/* Close the client socket */
 	close (client_socket);
 	
-	sleep(1);
+	//sleep(1);
 
 		
 	return 0;

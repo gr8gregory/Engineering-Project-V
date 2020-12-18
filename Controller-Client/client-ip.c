@@ -49,7 +49,7 @@ int sendCMD(unsigned char cmd, unsigned short val){
 	buffer[3] ='\0';
 	
 	/* Sanity Check */
-	printf("Printing buffer: %x%x%x \n\n", buffer[0],buffer[1],buffer[2]);
+	//printf("Printing buffer: %x%x%x \n\n", buffer[0],buffer[1],buffer[2]);
 
 
 	/*
@@ -89,7 +89,7 @@ int sendCMD(unsigned char cmd, unsigned short val){
 	write (client_socket, buffer, strlen (buffer));
 
 	/* Indicate the message was sent */
-	printf ("msg sent\n");
+	//printf ("msg sent\n");
 	
 	/* Close the client socket */
 	close (client_socket);
