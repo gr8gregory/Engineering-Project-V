@@ -82,7 +82,7 @@ int main(void)
 	while(1)
 	{
 		EnableInterrupts;
-		uint32_t stepGoToPos_deg = 0;//Each loop reset to zero
+		uint32_t stepGoToPos_deg = 90;//Each loop reset to zero
 		
 		if(COMMAND_ENTERED)
 		{
@@ -135,7 +135,8 @@ int main(void)
 							servoSet(stepGoToPos_deg);
 							}
 					
-
+					clearInput();
+					EnableInterrupts;
 				break;
 				
 				case STEPPER_CMD:
@@ -149,12 +150,12 @@ int main(void)
 									if(vportInput[4] == 'L')
 									{
 										DisableInterrupts;
-									stepGoToPos_deg = getStep() + 9; //Move by a set position
+									stepGoToPos_deg = getStep() + 9UL; //Move by a set position
 									}
 									else
 									{
 										DisableInterrupts;
-									stepGoToPos_deg = getStep() - 9; //9UL; //Move by a set position
+									stepGoToPos_deg = getStep() - 9UL; //9UL; //Move by a set position
 									}
 							} // End if
 							else 
@@ -166,7 +167,7 @@ int main(void)
 							} // End else
 						
 							
-						vportPrintf("Stepper %u\n", stepGoToPos_deg);
+						vportPrintf("Stepper %d\n", stepGoToPos_deg);
 							
 						//Check stepper position to determin if it can be moved
 						if ((stepGoToPos_deg < 0) || (stepGoToPos_deg > FULL_RIGHT_DEG)) 
@@ -196,7 +197,8 @@ int main(void)
 						else {
 							if (VERBOSE_MODE)
 								vportPrintf("\rInput not a number\n");
-						} // End if
+							speed = SAME_SPEED;
+						} // End else
 					} // End for
 						
 					if(speed > TOP_SPEED) {

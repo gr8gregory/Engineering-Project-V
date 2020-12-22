@@ -83,14 +83,14 @@ void TIM2_IRQHandler(void) {
 			static uint8_t Rstate;									// Get bits 1 and 2 for right motor
 			
 			// Check delay flags (so motors have some time to stop before switching directions)
-			if(delayL) {
+			if(delayL > 10) {
 				delayL = 0;
 				FORCE_BITS(DC_DIR_L_PORT->ODR, LOCK << DC_DIR_FL_PIN,
 							dirL << DC_DIR_FL_PIN);						// F pin is the lower one (ASSUMPTION)
 				Lstate = dirL;
 			} // End if
 			
-			if(delayR) {
+			if(delayR > 10) {
 				delayR = 0;
 				FORCE_BITS(DC_DIR_R_PORT->ODR, LOCK << DC_DIR_FR_PIN,
 							dirR << DC_DIR_FR_PIN);						// F pin is the lower one (ASSUMPTION)
