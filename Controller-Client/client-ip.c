@@ -26,7 +26,7 @@
 #include "controllerH.h"
 
 /* Global Variables */
-unsigned char buffer[4];
+//unsigned char buffer[41];
 
 int status = 0;
 int client_socket, len;
@@ -37,6 +37,7 @@ struct hostent *host;
  * Recieve read data from the controller
  */
 int sendCMD(unsigned char cmd, unsigned short val){	
+	char* buffer = (char*)calloc(41, sizeof(char));
 	
 	/* Place the button hex value into index 0 */
 	buffer[0] = cmd;
@@ -49,7 +50,7 @@ int sendCMD(unsigned char cmd, unsigned short val){
 	buffer[3] ='\0';
 	
 	/* Sanity Check */
-	printf("Printing buffer: %x%x%x \n\n", buffer[0],buffer[1],buffer[2]);
+	//printf("Printing buffer: %x%x%x \n\n", buffer[0],buffer[1],buffer[2]);
 
 
 	/*
@@ -65,7 +66,7 @@ int sendCMD(unsigned char cmd, unsigned short val){
 	 */
 	
 	memset (&server_addr, 0, sizeof (server_addr));
-	server_addr.sin_addr.s_addr = inet_addr("10.121.112.149"); // Hard coded IP address of lab computer here
+	server_addr.sin_addr.s_addr = inet_addr("10.121.112.146"); // Hard coded IP address of lab computer here
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons (5000); // hard coded the lab computer port here
 
@@ -86,16 +87,25 @@ int sendCMD(unsigned char cmd, unsigned short val){
 	 */
 	
 	/* Write the buffer to the Server */
+	//printf ("%s\n",buffer);
 	write (client_socket, buffer, strlen (buffer));
-
+	//sleep(1);
+	buffer[3] = '4';
+	buffer[40] = '\0';
+	read(client_socket,buffer,40);
+	
+	if(((strlen(buffer)) > 1 ) && (strlen(buffer) < 38))
+	{
 	/* Indicate the message was sent */
-	printf ("msg sent\n");
+	printf("Nucleo Connected\n");
+	printf ("%s\n",buffer);
+	}
+	
 	
 	/* Close the client socket */
 	close (client_socket);
 		
 	return 0;
 }
-
 
 

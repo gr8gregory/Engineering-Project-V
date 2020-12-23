@@ -22,7 +22,7 @@
 
 #define PORT 5000
 
-unsigned char buffer[4];
+unsigned char buffer[2];
 
 
 /*
@@ -36,7 +36,7 @@ unsigned char buffer[4];
 void
 SigCatcher (int n)
 {
-    wait3 (NULL, WNOHANG, NULL);    
+	wait3 (NULL, WNOHANG, NULL);    
 	signal (SIGCHLD, SigCatcher);
 }
 
@@ -50,8 +50,8 @@ main (int argc, char *argv[])
 	FILE *p;
 
 
-	if (argc != 2) {
-		printf ("usage: c PORT_NUMBER\n");
+	if (argc != 1) {
+		printf ("usage: c \n");
 		return 1;
 	}	/* endif */
 
@@ -77,7 +77,7 @@ main (int argc, char *argv[])
 	memset (&server_addr, 0, sizeof (server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = htonl (INADDR_ANY);
-	server_addr.sin_port = htons (atoi(argv[1]));
+	server_addr.sin_port = htons (PORT);
 
 	if (bind (server_socket, (struct sockaddr *)&server_addr, 
 	sizeof (server_addr)) < 0) {
@@ -133,7 +133,7 @@ main (int argc, char *argv[])
 			read (client_socket, buffer, BUFSIZ);
 
 			/* print the incoming buffer */
-			printf("Incoming Buffer: %x%x%x", buffer[0],buffer[1],buffer[2]);
+			printf("Ping: %x", buffer[0]);
 
 			/*
 			 * write data to client, close socket, and exit child app
@@ -142,9 +142,6 @@ main (int argc, char *argv[])
 			close (client_socket);
 			return 0;
 		}		
-		
-		
-		
 		
 		else {
 			/*
@@ -157,6 +154,5 @@ main (int argc, char *argv[])
 
 	return 0;
 }	/* end main */
-
 
 

@@ -45,7 +45,7 @@ int controller (void){
 	
 	int status = 0;
 	// Check to see if the device can be opened
-	int fd = open ("/dev/input/js0", O_RDONLY);
+	int fd = open ("/dev/input/js2", O_RDONLY);
  	
  	/* Check if the controller can be opened */
 	if( fd < 0 ){ 
@@ -138,9 +138,12 @@ int controller (void){
  * Take teh read value, assign its corresponding hex value and send the information off to be sent to the lab computer
  */
 
+
+
+// Update: Add Homeing for Servo And stepper, and 360 to right trigger, and potentially serial break
 int command (u_int16_t number, u_int16_t value, int Periferal){
 	
-	
+
 	// Set the cmd Char to 0
 	cmd = 0x0;
 	
@@ -218,6 +221,7 @@ int command (u_int16_t number, u_int16_t value, int Periferal){
 				
 			case 3:
 				cmd = 0xb; 
+
 				val = value;
 				break;
 				
