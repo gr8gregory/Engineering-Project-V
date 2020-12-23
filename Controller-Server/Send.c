@@ -1,10 +1,17 @@
 #include "server-ip.h"
 #include "serial.h"
 
-int sendPKG (unsigned char *buf, int len);
 
-char serialPath[] = "/dev/ttyS3";
+char serialPath[] = "/dev/ttyS2";
 
+char* sendPKG (unsigned char *buf, int len){
+	char * args[2];
+	args[1] = serialPath;
+	strcat(buf, "\r");
+	
+	char* feedback = sendSerial(2,args,buf);
+	return feedback;
+}
 
 /* Gregs Controller Button Mapout
  *
@@ -66,16 +73,18 @@ char serialPath[] = "/dev/ttyS3";
  *
  */
 
-int serverOutput (unsigned char* buf){
+char* serverOutput (unsigned char* buf){
 	
 	
 	unsigned short conversion = 0;
 	unsigned short val = 0;
-	unsigned char pkg[6];
+	unsigned char pkg[7];
+	char* feedback;
 	
 	val |= (buf[1] << 8); 	// Upper Nibble
 	val |= (buf[2]);	// Lower Nibble
 		
+
 	
 	switch(buf[0]){
 	
@@ -102,7 +111,7 @@ int serverOutput (unsigned char* buf){
 				pkg[5] = '\0';
 			}
 			
-			sendPKG(pkg, strlen(pkg));
+			feedback = sendPKG(pkg, strlen(pkg));
 			//printf("\n*** %s, %x%x ***\n", pkg, pkg[3], pkg[4]);
 			
 			break;
@@ -128,77 +137,127 @@ int serverOutput (unsigned char* buf){
 				pkg[5] = '\0';
 			}
 			
-			sendPKG(pkg, strlen(pkg));
+			feedback = sendPKG(pkg, strlen(pkg));
 			//printf("\n***%s, %x%x***\n", pkg, pkg[3], pkg[4]);
 			
 			break;
 		case 0x6: // Stepper 
-			if (val == 0x8001){
+
+			
+			if (val == 0x8001 ){
 			printf("true\n");
 				pkg[0] = 'S';
 				pkg[1] = 'T';
 				pkg[2] = ' ';
 				pkg[3] = 'L';
 				pkg[4] = '\0';
+				
 			}
 
-			else{
+			else if(val == 0x7FFF){
 				pkg[0] = 'S';
 				pkg[1] = 'T';
 				pkg[2] = ' ';
 				pkg[3] = 'R';
 				pkg[4] = '\0';
+				
 			}
-			sendPKG(pkg, strlen(pkg));
+			feedback = sendPKG(pkg, strlen(pkg));
 
 			break;
-		case 0x7: // Servo
+		case 0x5: // Servo
+
 			if (val == 0x8001){
-				pkg[0] = 'S';
+				pkg[0] = 'T';
 				pkg[1] = 'V';
 				pkg[2] = ' ';
 				pkg[3] = 'U';
 				pkg[4] = '\0';
 			}
 
-			else{
-				pkg[0] = 'S';
+			else if(val == 0x7FFF){
+				pkg[0] = 'T';
 				pkg[1] = 'V';
 				pkg[2] = ' ';
 				pkg[3] = 'D';
 				pkg[4] = '\0';
 			}
-			sendPKG(pkg, strlen(pkg));
-
-			break;
-		case 0xe: // ping
+			feedback = sendPKG(pkg, strlen(pkg));
+	
+		case 0x8: // Flip LED
 			
-			pkg[0] = 'P';
-			pkg[1] = '\0';
-			
-			sendPKG(pkg, strlen(pkg));
-			//printf("\n***%s***\n", pkg);
-			
-			break;
-		case 0xf: // LED
-			
-			pkg[0] = 'F';
-			pkg[1] = '\0';
-			
-			sendPKG(pkg, strlen(pkg));
-			//printf("\n***%s***\n", pkg);
-			
+			if(val == 1){
+				pkg[0] = 'F';
+				pkg[1] = '\0';
+				
+				sendPKG(pkg, strlen(pkg));
+				//printf("\n***%s***\n", pkg);
+			}
 			break;
 			
-		default:
-			return 0;
+		case 0x9: // Home Stepper
+			
+			if(val == 1){
+				pkg[0] = 'S';
+				pkg[1] = 'H';
+				pkg[2] = '\0';
+				
+				feedback = sendPKG(pkg, strlen(pkg));
+			}	
+			break;
+			
+		case 0xa: // Home Servo
+			
+			if(val == 1){
+				pkg[0] = 'V';
+				pkg[1] = 'H';
+				pkg[2] = '\0';
+				
+				feedback = sendPKG(pkg, strlen(pkg));
+			}
+			
+			break;
+		
+		case 11: // ping
+				pkg[0] = 'P';
+				pkg[1] = '\0';
+				feedback = sendPKG(pkg, strlen(pkg));
+			
+			break;
+			
+		case 0xf: // DO 360
+			
+			if(val == 1){
+				pkg[0] = 'Z';
+				pkg[1] = '0';
+				pkg[2] = '\0';
+				
+				feedback = sendPKG(pkg, strlen(pkg));
+			}
+			
+		// When button is released, it will read 'Z1' which should terminate the rotation
+			if(val == 0){
+				pkg[0] = 'Z';
+				pkg[1] = '1';
+				pkg[2] = '\0';
+				
+				feedback = sendPKG(pkg, strlen(pkg));
+			}
+			
+			break;
+			
+		
 		}
-	return 0;
+	return feedback;
 }
 
-int sendPKG (unsigned char *buf, int len){
-	char * args[2];
-	args[1] = serialPath;
-	sendSerial(2,args,buf);
+
+
+
+// Function to send the ping command to the client.
+void sendPING (void){
+	
+	sendP();
 }
+
 

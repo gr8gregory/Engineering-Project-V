@@ -26,11 +26,15 @@
 
 #include <unistd.h> // write(), read(), close()
 
+//static char read_buf[50];
+char error[] = "1";
+char noerror[] = "0";
 
 
 
 
-int sendSerial(int argc, char* argv[], char* buf) {
+
+char* sendSerial(int argc, char* argv[], char* buf) {
 
  
 
@@ -80,7 +84,7 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
       printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
 
-      return 1;
+      return error;
 
   }
 
@@ -190,59 +194,13 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
   // ***Block Time Settings**
 
-  tty.c_cc[VTIME] = 10;    //VTIME determines the block time for read()
+  tty.c_cc[VTIME] = 0;    //VTIME determines the block time for read()
 
-  tty.c_cc[VMIN] = 0;      //VMIN determines the min number of characters rcv'd before unblocking read()
-
-  
+  tty.c_cc[VMIN] = 9;      //VMIN determines the min number of characters rcv'd before unblocking read()
 
   
 
-	// VMIN = 0, VTIME = 0: 	read() is No blocking, return immediately with what is available in the read buffer received from the com port.
-
-	
-
-	
-
-	
-
-	// VMIN > 0, VTIME = 0: 	This will make read() always wait for bytes (timed block on read()) 
-
-	//				exactly how many is determined by VMIN), so read() could block indefinitely.
-
-	// In this mode, read "ALWAYS" wait for contents from the serial port
-
-	// But it would be determined by the number of characters received defined by VMIN
-
-	
-
-	
-
-	
-
-	// VMIN = 0, VTIME > 0: 	This is a blocking read() of any number chars with a maximum timeout (given by VTIME). 
-
-	//				read() will block until either any amount of data is available, or the timeout occurs.
-
-	// read() will block for VTIME amount of time, and unblock if we have rcv'd any data
-
-	 
-
-	 
-
-	
-
-	// VMIN > 0, VTIME > 0: 	Block until either VMIN characters have been received, or VTIME after first character has elapsed. 
-
-	//							Note that the timeout for VTIME does not begin until the first character is received.
-
-	
-
-	
-
-	//the number shoudl be in milliseconds (look up to confirm!)
-
-	
+  
 
 	
 
@@ -266,7 +224,7 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
       printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
 
-      return 1;
+      return error;
 
   }
 
@@ -278,6 +236,10 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
   // Write to serial port
 
+  //TODO Test the serial input to see if it matches what is sent.
+
+  printf("%s", buf);
+
 
 
   write(serial_port, buf, strlen(buf));
@@ -286,7 +248,7 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
   // Allocate memory for read buffer, set size according to your needs
 
-  char read_buf [256];
+  //char* read_buf = (char*)calloc(0,50 * sizeof(char));
 
 
 
@@ -295,8 +257,9 @@ int sendSerial(int argc, char* argv[], char* buf) {
   // ASCII data for this example, we'll set everything to 0 so we can
 
   // call printf() easily.
+  char* read_buf = calloc(41, sizeof(char));
 
-  memset(&read_buf, '\0', sizeof(read_buf));
+  memset(read_buf, '\0', 40);
 
 
 
@@ -306,7 +269,10 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
   // settings above, specifically VMIN and VTIME
 
-  int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
+  int num_bytes = read(serial_port, read_buf, 40);
+ 
+
+
 
 
 
@@ -316,22 +282,24 @@ int sendSerial(int argc, char* argv[], char* buf) {
 
       printf("Error reading: %s", strerror(errno));
 
-      return 1;
+      return error;
 
   }
-
+	char* feedback = read_buf;
 
 
   // Here we assume we received ASCII data, but you might be sending raw bytes (in that case, don't try and
 
   // print it to the screen like this!)
 
-  printf("Read %i bytes. Received message: %s", num_bytes, read_buf);
+  printf("Read %i bytes. Received message: %s\n", num_bytes, read_buf);
+
+  
 
 
 
   close(serial_port);
 
-  return 0; // success
+  return read_buf; // success
 
 }
