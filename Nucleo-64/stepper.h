@@ -35,4 +35,5 @@ void stepper_Init(void);
 void stepHome(void);
 static void step_clock_Init(void);
 void TIM3_IRQHandler(void);
+uint32_t getStep(void );
 #endif

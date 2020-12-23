@@ -23,4 +23,5 @@
 // Function prototypes
 void usartInit(USART_TypeDef * USARTx);
 
+
 #endif

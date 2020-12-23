@@ -26,9 +26,9 @@
 
 
 // Global Variables
-volatile uint32_t stepCurPos_step = 0;				// Not sure how large this will get
+volatile uint32_t stepCurPos_step = 5000;				// Not sure how large this will get
 volatile uint32_t stepGoToPos_step = 0;				// Same range as stepCurPos
-uint32_t stepCount_step = 0;									// Same range as stepCurPos
+uint32_t stepCount_step = 0xA000;									// Same range as stepCurPos
 uint16_t overflow = 0;
 extern volatile uint8_t leftLimitFlag;				// Indicates left limit reached
 extern volatile uint8_t rightLimitFlag; 			// Indicates right limit reached
@@ -37,6 +37,11 @@ static const uint8_t halfStep[8] = {0x9, 0x8, 0xa, 0x2, 0x6, 0x4, 0x5, 0x1};		//
 volatile uint8_t nextStep = 0;								// Offset into halfStep[]
 
 static uint8_t stepType = FULL_STEP;
+
+uint32_t getStep(void )
+{
+	return ((stepCurPos_step * FULL_RIGHT_DEG ) / (stepCount_step));
+}
 
 
 // Home stepper motor on initialization
@@ -62,7 +67,7 @@ void stepper_Init(void) {
 	GPIOx_PIN_PULL(STEP_PORT, STEP_PIN_D, PULL_UP);
 	
 	// Home the stepper motor
-	stepHome();
+	//stepHome();
 	step_clock_Init();
 
 } // End stepper_Init()

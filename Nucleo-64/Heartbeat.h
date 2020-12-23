@@ -17,6 +17,7 @@
 
 #include "virtualPort.h" 		// For vportPrintf()
 #include "LED.h"						// For Red_LED_Toggle()
+#include "dcmotor.h"				// For dirL and dirR
 
 
 // Definitions

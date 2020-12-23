@@ -49,4 +49,8 @@ void usartInit(USART_TypeDef * USARTx) {
 	
 }	// End usartInit()
 
+void usartMenuPrint(void)
+{
+}//End of USART MENU PRINT
+
 

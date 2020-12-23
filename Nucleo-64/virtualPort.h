@@ -41,6 +41,8 @@ void vportPrintf(char *fmt, ...);
 static void vportPuts(char *str);
 static void vportPutc(char c);
 void USART2_IRQHandler(void);
+void vportMenuPrint(void);
+void clearInput(void);
 
 
 #endif
